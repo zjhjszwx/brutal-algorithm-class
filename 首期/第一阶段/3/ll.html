@@ -1,0 +1,131 @@
+<html>
+
+<head>
+    <script>
+        function Node(v) {
+            return {
+                v: v,
+                next: null,
+                first: function* (n) {
+                    yield this.v
+                    // console.log("first", n, this.v, this.next)
+                    // console.log(this.next && n > 1)
+                    if (this.next && n > 1) {
+                        yield* this.next.first(n - 1)
+                    }
+                },
+                sorted_add: function (v) {
+                    if (this.v <= v && this.next === null) {
+                        n = Node(v)
+                        this.next = n
+                        return
+                    }
+                    if (this.v <= v && v <= this.next.v) {
+                        n = Node(v)
+                        n.next = this.next
+                        this.next = n
+                        return
+                    }
+                }
+            }
+        }
+        function LinkedList() {
+            return {
+                head: null,
+                next: null,
+                add: function (v) {
+                    if (!this.head) {
+                        this.head = Node(v)
+                        return this.head
+                    }
+                    let cur = this.head
+                    while (cur.next) {
+                        cur = cur.next
+                    }
+                    cur.next = Node(v)
+                    return cur.next
+                },
+                sorted_add: function (v) {
+                    if (this.head.v > v) {
+                        let n = Node(v)
+                        n.next = this.head
+                        this.head = n
+                        return
+                    }
+                    if (this.head) {
+                        this.head.sorted_add(v)
+                    }
+                },
+                pophead: function () {
+                    v = this.head.v
+                    this.head = this.head.next
+                    return v
+                },
+                print: function () {
+                    let cur = this.head
+                    while (cur) {
+                        console.log(cur.v)
+                        cur = cur.next
+                    }
+                },
+                first: function (n) {
+                    if (this.head) {
+                        return this.head.first(n)
+                    }
+                },
+                movehead: function () {
+                    this.head = this.head.next
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <ul id="list"></ul>
+    <script>
+        globalThis.addEventListener('Model Change', function (e) {
+            let ul = document.getElementById("list");
+            first5 = e.detail.data();
+            while (ul.firstChild) {
+                ul.removeChild(ul.firstChild);
+            }
+            for (let ele = first5.next(); ele.value != undefined; ele = first5.next()) {
+                let listNode = document.createElement("LI");
+                let text = document.createTextNode(ele.value);
+                listNode.appendChild(text);
+                ul.appendChild(listNode);
+            }
+        })
+    </script>
+    <script>
+        // Create the linked listt model
+        let model = LinkedList();
+        let head = model.add("a");
+        model.add("b");
+        model.add("c");
+        model.add("d");
+        let tail = model.add("e");
+        // Make the model circular
+        tail.next = head;
+
+        // Shift the model once per second.
+        (function animate(model) {
+            let e = new CustomEvent("Model Change", {
+                detail: {
+                    data: function () {
+                        return model.first(5)
+                    }
+                }
+            });
+            globalThis.dispatchEvent(e);
+            setTimeout(function () {
+                model.movehead();
+                animate(model);
+            }, 2000);
+        })(model);
+    </script>
+
+</body>
+
+</html>
