@@ -1,0 +1,48 @@
+<head>
+</head>
+<html>
+    <div id="c"></div>
+    <script>
+            function Sampler() {
+                let n = 0;
+                let sample;
+                return {
+                    onData: function(ele) {
+                        n++;
+                        if (Math.random() < 1 / n) {
+                            sample = ele;
+                        }
+                    },
+                    sample: function() {
+                        return sample;
+                    }
+                }
+            }
+    
+            function simulation(times, limit) {
+                let distribution = {};
+                for (let j = 0; j < times; j++) {
+                    let sampler = Sampler();
+                    for (let i = 0; i < limit; i++) {
+                        sampler.onData(i)
+                    }
+                    let sample = sampler.sample();
+                    if (sample in distribution) {
+                        distribution[sample] += 1;
+                    } else {
+                        distribution[sample] = 1;
+                    }
+                }
+                return distribution;
+            }
+    
+            let dis = simulation(10000, 50);
+            for (ele in dis) {
+                let c = document.getElementById("c");
+                let div = document.createElement("DIV");
+                div.textContent = ele.toString() + " " + dis[ele].toString();
+                c.appendChild(div);
+            }
+            
+        </script>
+</html>
