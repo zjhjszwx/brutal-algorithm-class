@@ -8,12 +8,12 @@
 ### BFS
 迭代方法（Queue）
 
-## 第二讲：二叉搜索树
+## 第二讲：二叉搜索树 & 平衡二叉树（AVL Tree）
 
-## 第三讲：平衡二叉树（AVL Tree）
+## 第三讲：Min/Max Heap 以及优先级队列（Priority Queue）
 
-## 第四讲：Min/Max Heap 以及优先级队列（Priority Queue）
+## 第四讲：二叉树的扁平化实现（Array implemented Tree）
 
-## 第五讲: 二叉树的扁平化实现（Array implemented Tree）
+## 第五讲: 哈夫曼编码、压缩算法
 
 ## 第六讲：总结
