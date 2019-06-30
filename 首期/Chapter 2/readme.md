@@ -13,8 +13,10 @@
 ## 第二讲：二叉搜索树 & 平衡二叉树（AVL Tree）
 
 ## 第三讲：Min/Max Heap 以及优先级队列（Priority Queue）
+1. 二叉树的扁平化实现（Array implemented Tree）
+2. Min Heap
 
-## 第四讲：二叉树的扁平化实现（Array implemented Tree）
+## 第四讲：?
 
 ## 第五讲：哈夫曼编码、压缩算法
 
