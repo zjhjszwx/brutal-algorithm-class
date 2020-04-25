@@ -4,7 +4,7 @@
 
 刷题不是本课程的目的。学习完本课程之后，有能力做困难的编程题仅仅是一个副作用。
 
-[GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
+想报名的同学加 QQ 群：538935270
 
 ## 课程大纲
 本课程分为直播课与一对一辅导时间。
@@ -198,3 +198,6 @@
 - 牛顿方法
 - 反向传播
 - 卡尔曼滤波器 kalman filter
+
+
+[GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
