@@ -18,7 +18,7 @@
 | - | - | - | - |
 | A | :heavy_check_mark: 48 小时 | 4 小时 | 2400 |
 | B | :heavy_check_mark: 48 小时 | 8 小时 | 3120 |
-| C | :heavy_check_mark: 48 小时 | 16 小时 | 4560 |
+| C | :heavy_check_mark: 48 小时 | 12 小时 | 3840 |
 
 ## 第一周
 ### 第 1 课
