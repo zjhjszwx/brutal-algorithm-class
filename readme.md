@@ -16,10 +16,10 @@
 目前有 4 个套餐
 | 套餐 | 直播课 | 一对一辅导 | 价格 |
 | - | - | - | - |
-| A | :heavy_check_mark: 48 小时 | 4 小时 | 2400 |
-| B | :heavy_check_mark: 48 小时 | 8 小时 | 3120 |
-| C | :heavy_check_mark: 48 小时 | 12 小时 | 3840 |
-| D | :heavy_check_mark: 48 小时 | 16 小时 | 4560 |
+| A | :heavy_check_mark: 48 小时 | X | 1200 |
+| B | :heavy_check_mark: 48 小时 | 4 小时 | 2000 |
+| C | :heavy_check_mark: 48 小时 | 8 小时 | 2720 |
+| D | :heavy_check_mark: 48 小时 | 12 小时 | 3360 |
 
 ## 第一周
 ### 第 1 课
