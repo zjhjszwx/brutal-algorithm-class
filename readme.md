@@ -63,13 +63,12 @@ Let's plant trees!
 - 堆排序 Heap Sort
 - 优先级队列 Priority Queue
 
-### 第 8 课（练习课）
-第一个月的练习课！让我们来练习一些关于数组与树的题目。
-
+### 第 8 课
 植树非一周之功！
-### 第 9 课
 - 平衡的二叉树
 - AVL树
+
+### 第 9 课
 - 红黑树
 
 ## 第四周
@@ -81,7 +80,6 @@ Let's plant trees!
 - Open Addressing
 - Dynamic Resizing
 
-本周精讲图 Graph Week!
 ### 第 11 课
 - 图 Graph
 - 图的三种内存表示形式
@@ -93,7 +91,7 @@ Let's plant trees!
 - 贝尔曼-福特算法 Bellman Ford's Algorithm
 
 ## 第五周
-继续作图
+继续学习图算法
 ### 第 13 课
 - 拓扑排序 Topological Sort
 - Minimum Spanning Tree
@@ -101,21 +99,19 @@ Let's plant trees!
 ### 第 14 课
 - Union Find
 
-咱编程的人，有啥不一样？说不刷题，其实也刷题！
-### 第 15 课（练习课）
-- 本节课专注于与排序和搜索相关的问题
+### 第 15 课
+- Minimal Cut / Maximal Flow
+- 子图匹配 Subgraph matching
 
 ## 第六周
-### 第 16 课（练习课）
- 本节课专注于与树、图相关的问题
-
-动态规划，做时间的朋友！
-### 第 17 课
+动态规划，做一个时间刺客！
+### 第 16 课
 - 初探动态规划
 - 递归与循环的关系
 - 递归式循环
 - 斐波那契数列
 
+### 第 17 课
 - 再看动态规划
 - Subset Sum Problem
 - 0-1 Knapsack Problem
@@ -136,47 +132,25 @@ Let's plant trees!
 ### 第 20 课
 - 词法分析 Lexical Analysis
 
-语法很重要
 ### 第 21 课
+语法很重要
 - Context Free Language
-
-## 第八周
-### 第 22 课
 - 语法解析 Grammar Parsing 
 
-### 第 23 课（练习课）
-图算法加强练习
-
-### 第 24 课（练习课）
-动态规划加强练习
-
-## 第九周
-### 第 25 课
+## 第八周
 贪得无厌，必有算法！Greedy Algorithm
+### 第 22 课
 - 贪婪算法
+
+### 第 23 课
 - 压缩算法
 - 哈夫曼编码
 
-### 第 26 课
+### 第 24 课
 - 哈夫曼解码
 
-图灵诚不欺我
-### 第 27 课
-- 初识 P vs NP
 
-## 第十四周
-### 第 28 课
-- 再看 P vs NP 以及巩固算法复杂度分析的数学基础
 
-### 第 29 课
-简单讲解一些进阶的图算法
-- Minimal Cut / Maximul Flow
-- 子图匹配 Subgraph Matching
-- 在图形数据库中的实践
-
-### 第 30 课（练习课）
-课程进入尾声，让我们再来练习！
-- 数组/字符串/序列/、链表、集合、哈希
 
 
 [GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
