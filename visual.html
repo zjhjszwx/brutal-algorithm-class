@@ -1,0 +1,22 @@
+<html>
+
+<canvas id="myCanvas" style="height:100%; width:100%;">
+</canvas>
+
+<script>
+function paintArray(canvas, array) {
+    let ctx = canvas.getContext("2d");
+
+    for(let [i, num] of Object.entries(array)) {
+        ctx.beginPath();
+        console.log(i);
+        ctx.rect((20 + i * 5, 20, 20, num);
+        ctx.stroke();
+    }
+}
+
+let c = document.getElementById("myCanvas");
+paintArray(c, [3,4,2,5,1]);
+</script>
+
+</html>
