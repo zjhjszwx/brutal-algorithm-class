@@ -8,15 +8,26 @@ function paintArray(canvas, array) {
     let ctx = canvas.getContext("2d");
 
     for(let [i, num] of Object.entries(array)) {
-        ctx.beginPath();
+        // ctx.beginPath();
         console.log(i);
-        ctx.rect((20 + i * 5, 20, 20, num);
+        ctx.rect(20 + i * 20, 20, 5, 5 * num);
         ctx.stroke();
     }
 }
 
-let c = document.getElementById("myCanvas");
-paintArray(c, [3,4,2,5,1]);
+function sleep(time) {
+    return new Promise((resolve) => {
+        setTimeout(resolve, time);
+    })
+}
+
+async function main() {
+    let c = document.getElementById("myCanvas");
+    paintArray(c, [3,4,2,5,1]);
+    await sleep(1000);
+    paintArray(c, [3,4,2,5,1,2]);
+}
+main();
 </script>
 
 </html>
