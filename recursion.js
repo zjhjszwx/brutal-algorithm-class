@@ -30,17 +30,34 @@ function countDown(n) {
 //     }
 // )(5);
 
-let recursion = (
-    (f) => (g) => (n) => g(g)(f)(n)
-)(
-    (f) => (g) => (n) => g(g)(f)(n)
-)
+// let recursion = (
+//     (f) => (g) => (n) => g(g)(f)(n)
+// )(
+//     (f) => (g) => (n) => g(g)(f)(n)
+// )
 
-recursion(
-    (g) => (f) => (n) => {
-        if (n > 0) {
-            console.log(f(f)(g)(n - 1))
-        }
-        return n;
+// recursion(
+//     (g) => (f) => (n) => {
+//         if (n > 0) {
+//             console.log(f(f)(g)(n - 1))
+//         }
+//         return n;
+//     }
+// )(5);
+
+function fibonacciOptimized(n, seq) {
+    if(n === 0) {
+        return [1, [1]]
     }
-)(5);
+    if(n === 1) {
+        return [1, [1, 1]]
+    }
+    if(n < seq.length) {
+        return [seq[n], seq]
+    }
+    let [n2, seq2] = fibonacciOptimized(n - 2, seq)
+    let [n1, seq1] = fibonacciOptimized(n - 1, seq2)
+    seq1.push(n2+n1)
+    return [seq1[seq1.length - 1], seq1]
+}
+console.log(fibonacciOptimized(100, [])[0])
