@@ -45,19 +45,20 @@ function countDown(n) {
 //     }
 // )(5);
 
-function fibonacciOptimized(n, seq) {
-    if(n === 0) {
-        return [1, [1]]
+function fibonacciOptimized2(n) {
+    let seq = [1, 1];
+    function internal(n, seq) {
+        if(n < seq.length) {
+            return [seq[n], seq]
+        }
+        let [n2, seq2] = internal(n - 2, seq)
+        let [n1, seq1] = internal(n - 1, seq2)
+        seq1.push(n2+n1)
+        return [seq1[seq1.length - 1], seq1]
     }
-    if(n === 1) {
-        return [1, [1, 1]]
-    }
-    if(n < seq.length) {
-        return [seq[n], seq]
-    }
-    let [n2, seq2] = fibonacciOptimized(n - 2, seq)
-    let [n1, seq1] = fibonacciOptimized(n - 1, seq2)
-    seq1.push(n2+n1)
-    return [seq1[seq1.length - 1], seq1]
+    return internal(n, seq)[0];
 }
-console.log(fibonacciOptimized(100, [])[0])
+console.log(fibonacciOptimized2(1))
+console.log(fibonacciOptimized2(2))
+console.log(fibonacciOptimized2(3))
+console.log(fibonacciOptimized2(4))
