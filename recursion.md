@@ -139,3 +139,20 @@ function fibonacciOptimized2(n) {
 这里我们在函数内部定义了一个内部函数，将记录数列这个细节封装了起来。同时代码量也减少了。这就是模组化的力量。
 
 Python、Go 都允许定义内部函数。有些语言不允许，那么你可以将这个函数写在外部。
+
+# 能更简洁吗？
+`internal`只在内部被使用，能不能作为一个匿名函数呢？比如
+```js
+function fibonacciOptimized2(n) {
+    let seq = [1, 1];
+    return (function(n, seq) {
+        if(n < seq.length) {
+            return [seq[n], seq]
+        }
+        let [n2, seq2] = ???(n - 2, seq)    // 但如果是匿名函数，这里放什么呢？
+        let [n1, seq1] = ???(n - 1, seq2)
+        seq1.push(n2+n1)
+        return [seq1[seq1.length - 1], seq1]
+    })(n, seq)[0];
+}
+```
