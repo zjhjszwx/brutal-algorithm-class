@@ -37,13 +37,10 @@ let recursion = (
 )
 
 recursion(
-    (g) => (f) => {
-        return (n, m) => {
-            console.log(n);
-            if (n > 1) {
-                f(f)(g)(n - 1)
-            }
-            return n;
+    (g) => (f) => (n) => {
+        if (n > 0) {
+            console.log(f(f)(g)(n - 1))
         }
+        return n;
     }
 )(5);
