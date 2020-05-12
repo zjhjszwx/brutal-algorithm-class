@@ -314,5 +314,45 @@ countDown(countDown)(5);
 )(
     (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
 )
-
 ```
+```js
+let countDown2 = (
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)(
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)
+// 与
+function countDown(n) {
+    if (n > 1) {
+        countDown(n - 1);
+    }
+}
+// 是一模一样的。
+```
+到了这一步，你会发现，`self(self)`这一个部分总会存在。这个部分仅仅是为了制造一个递归的`countDown`函数而已，并不是`countDown`自己逻辑的一部分。我们能不能将这一部分抽象出来呢？
+```js
+// 让我们把`countDown`自己的逻辑抽出来，给一个名字`g`。
+// let g = (self) => (n) => { if (n > 1) { self(self)(n - 1); }
+// 我们能不能将`g`传入下面这个形式里，然后替换掉函数逻辑部分呢？
+(
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)(
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)
+```
+答案是可以的，如下
+```js
+let recursion = (
+    (self) => (g) => (n) => g(g)(self)(n)
+)(
+    (self) => (g) => (n) => g(g)(self)(n)
+)
+
+recursion((g) => (self) => (n) => {
+    console.log(n);
+    if (n > 1) {
+        self(self)(g)(n - 1)
+    };
+})(5)
+```
+
