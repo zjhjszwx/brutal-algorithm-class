@@ -140,6 +140,9 @@ function fibonacciOptimized2(n) {
 
 Python、Go 都允许定义内部函数。有些语言不允许，那么你可以将这个函数写在外部。
 
+---------------
+Warning: 从这里开始的内容对你日常编程几乎没有任何帮助，除非你的工作是：框架作者、语言作者等底层系统作者。
+
 # 能更简洁吗？
 `internal`只在内部被使用，能不能作为一个匿名函数呢？比如
 ```js
@@ -155,4 +158,76 @@ function fibonacciOptimized2(n) {
         return [seq1[seq1.length - 1], seq1]
     })(n, seq)[0];
 }
+```
+
+## 一个匿名函数如何引用它自己？
+`fibonacciOptimized2`可能过于复杂，我们还是拿`countDown`来举例吧。
+```js
+function(n) {
+    console.log(n);
+    if (n > 1) {
+        ???(n - 1); // 如何引用自己？
+    }
+}
+```
+最简单的方式是将自己作为一参数传进去。
+```js
+(
+    function(self, n) {
+        console.log(n);
+        if (n > 1) {
+            self(self, n - 1);
+        }
+    }
+)(
+    function(self, n) {
+        console.log(n);
+        if (n > 1) {
+            self(self, n - 1);
+        }
+    }
+)
+```
+我们使用简洁一点的语法重写一遍，去掉视觉干扰。
+```js
+(
+    (self, n) => { 
+        if (n > 1) { self(self, n - 1); }
+    }
+)(
+    (self, n) => { 
+        if (n > 1) { self(self, n - 1); }
+    }
+)
+```
+我们写了重复代码。这也是从小到大计算机教育告诉我们要避免的事情。我们能不能进一步抽象，将代码写的更简洁呢？
+
+为了将递归的逻辑和计数器本身的逻辑分开，我们还需要做一件事。首先你需要理解
+```js
+function add(a, b) {
+    return a + b;
+}
+add(1, 2)
+```
+可以改写为
+```js
+function add(a) {
+    return function(b) {
+        return a + b;
+    }
+}
+add(1)(2)
+```
+JS、Python、Go、C# 都允许这个写法。定义一个内部函数，然后返回给外层。这个特性叫做闭包（Closure）。
+
+```js
+(
+    (self, n) => { 
+        if (n > 1) { self(self, n - 1); }
+    }
+)(
+    (self, n) => { 
+        if (n > 1) { self(self, n - 1); }
+    }
+)
 ```
