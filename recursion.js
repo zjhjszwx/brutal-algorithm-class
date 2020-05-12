@@ -31,36 +31,31 @@ function countDown(n) {
 // )(5);
 
 // let recursion = (
-//     (f) => (g) => (n) => g(g)(f)(n)
+//     (f) => (g) => (n) => g(f)(g)(n)
 // )(
-//     (f) => (g) => (n) => g(g)(f)(n)
+//     (f) => (g) => (n) => g(g(f)(g))(n)
 // )
 
 // recursion(
-//     (g) => (f) => (n) => {
+//     (f) => (g) => (n) => {
+//         console.log(n);
+
 //         if (n > 0) {
-//             console.log(f(f)(g)(n - 1))
+//             f(f)(g)(n - 1)
 //         }
 //         return n;
 //     }
 // )(5);
+let recursion = (
+    (self) => (g) => (n) => g(g)(self)(n)
+)(
+    (self) => (g) => (n) => g(g)(self)(n)
+)
 
-function fibonacciOptimized2(n) {
-    let seq = [1, 1];
-    function internal(n, seq) {
-        if (n < seq.length) {
-            return [seq[n], seq]
-        }
-        let [n2, seq2] = internal(n - 2, seq)
-        let [n1, seq1] = internal(n - 1, seq2)
-        seq1.push(n2 + n1)
-        return [seq1[seq1.length - 1], seq1]
-    }
-    return internal(n, seq)[0];
-}
-console.log(fibonacciOptimized2(1))
-console.log(fibonacciOptimized2(2))
-console.log(fibonacciOptimized2(3))
-console.log(fibonacciOptimized2(4))
+recursion((g) => (self) => (n) => {
+    console.log(n);
+    if (n > 1) {
+        self(self)(g)(n - 1)
+    };
+})(5)
 
-    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
