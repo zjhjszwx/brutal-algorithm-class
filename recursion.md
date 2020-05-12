@@ -200,9 +200,26 @@ function(n) {
     }
 )
 ```
-我们写了重复代码。这也是从小到大计算机教育告诉我们要避免的事情。我们能不能进一步抽象，将代码写的更简洁呢？
+```js
+/* 语言小课堂 */
+// 在 JS 中，
+function(a, b) { return a + b }     // 1
+(a, b) => { return a + b }          // 2
+(a, b) => ( a + b )                 // 3
+(a, b) => a + b                     // 4
+// 都是匿名函数的写法。
 
-为了将递归的逻辑和计数器本身的逻辑分开，我们还需要做一件事。首先你需要理解
+// 类比 Python 就是
+def add(a, b):
+    return a + b
+lambda a, b: a + b
+// 不一样的是，Python的def必须跟名字。匿名必须lambda。
+
+// Python的def和lambda在语义上完全相同。
+// 但是JS的箭头函数=>和function函数在语义上略微不同，但是对本文内容没有影响。
+```
+
+我们写了重复代码。这也是从小到大计算机教育告诉我们要避免的事情。我们能不能进一步抽象，将代码写的更简洁呢？为了将递归的逻辑和计数器本身的逻辑分开，我们还需要做一件事。首先你需要理解
 ```js
 function add(a, b) {
     return a + b;
@@ -220,14 +237,82 @@ add(1)(2)
 ```
 JS、Python、Go、C# 都允许这个写法。定义一个内部函数，然后返回给外层。这个特性叫做闭包（Closure）。
 
+理解了以上操作后，我们可以来改写计数器的实现。
 ```js
+function(self, n) {
+    console.log(n);
+    if (n > 1) {
+        self(self, n - 1);
+    }
+}
+// 改为
+function(self) {
+    return function(n) {
+        console.log(n);
+        if (n > 1) {
+            self(self)(n - 1);
+        }
+    }
+}
+// 给一个名字
+let countDown = function(self) {
+    return function(n) {
+        console.log(n);
+        if (n > 1) {
+            self(self)(n - 1);
+        }
+    }
+}
+// 调用方式为
+countDown(countDown)(5);
+
+// 或者写成纯匿名的方式
 (
-    (self, n) => { 
-        if (n > 1) { self(self, n - 1); }
+    function(self) {
+        return function(n) {
+            console.log(n);
+            if (n > 1) {
+                self(self)(n - 1);
+            }
+        }
     }
 )(
-    (self, n) => { 
-        if (n > 1) { self(self, n - 1); }
+    function(self) {
+        return function(n) {
+            console.log(n);
+            if (n > 1) {
+                self(self)(n - 1);
+            }
+        }
     }
 )
+
+// 使用箭头函数重写缩减段落
+(
+    (self) => (
+        (n) => {
+            console.log(n);
+            if (n > 1) {
+                self(self)(n - 1);
+            }
+        }
+    )
+)(
+    (self) => (
+        (n) => {
+            console.log(n);
+            if (n > 1) {
+                self(self)(n - 1);
+            }
+        }
+    )
+)
+
+// 去掉console然后写成一行
+(
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)(
+    (self) => ((n) => { if (n > 1) { self(self)(n - 1); } })
+)
+
 ```
