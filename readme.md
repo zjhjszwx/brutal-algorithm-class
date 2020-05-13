@@ -160,7 +160,8 @@ Let's plant trees!
 ### 有录播课吗？
 每次直播都会录像
 
-
+## 课程视频
+[预习课：插入排序](https://www.bilibili.com/video/BV1gz411q74e/)
 
 
 [GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
