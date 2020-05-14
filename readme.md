@@ -157,8 +157,8 @@ Let's plant trees!
 ### 用什么语言？
 这是一节算法课，语言不是根本问题。课件会用JS因为我有准备一些前端算法可视化。作业大家可以用C, CPP, Java, Go, Python, JavaScript, 甚至 PHP。我都可以批改。
 
-### 有录播课吗？
-每次直播都会录像
+### 如何提交作业
+[如何提交作业](如何提交作业.md)
 
 ## 课程视频
 [预习课：插入排序](https://www.bilibili.com/video/BV1gz411q74e/)
