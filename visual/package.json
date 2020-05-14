@@ -1,0 +1,10 @@
+{
+  "name": "visual",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^3.9.2"
+  }
+}
