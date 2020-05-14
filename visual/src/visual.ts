@@ -5,12 +5,11 @@ function paintArray(svg: HTMLElement, document: Document, array: Array<number>) 
         // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
         // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
         let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        console.log(number);
-        rect.setAttribute('width', '5');
+        rect.setAttribute('width', '3');
         // @ts-ignore
         rect.setAttribute('height', number);
         // @ts-ignore
-        rect.setAttribute('x', `${i * 8}`);
+        rect.setAttribute('x', `${i * 4}`);
         svg.appendChild(rect);
     }
 
@@ -22,10 +21,13 @@ function sleep(time) {
     })
 }
 
-function InsertionSort(array) {
+async function InsertionSort(array, reactor) {
     let sortedArray = [];
     for (let i = 0; i < array.length; i++) { // n
         sortedArray = insert(sortedArray, array[i]);
+        await sleep(100);
+        console.log(array);
+        reactor(sortedArray.concat(array.slice(i+1)));
     }
     return sortedArray;
 }
@@ -55,33 +57,19 @@ function insert(array, number) {
     return sorted;
 }
 
-class ArrayViewModel extends Array {
-
-    _paintArray
-
-    constructor(array, paint) {
-        super(array);
-        this._paintArray = paint;
-    }
-
-    push(number) {
-        let l = super.push(number);
-        this._paintArray(this);
-        return l;
-    }
-
-}
-
 function empty(ele) {
     ele.textContent = undefined;
 }
 
 async function main() {
     let svg = document.getElementById("svg");
-    let array = new ArrayViewModel([], (a) => { return paintArray(svg, document, a) });
-    for (let i = 0; i < 10; i++) {
-        await sleep(1000);
-        array.push(i);
+    let array = [];
+    for (let i = 0; i < 50; i++) {
+        array.push(Math.random() * 50);
+        
     }
+    await InsertionSort(array, (array) => {
+        paintArray(svg, document, array)
+    })
 }
 main();
