@@ -25,6 +25,9 @@
 ## 作业
 每次都有课后作业。你可以用C、CPP、Java、Go、Python、JavaScript、甚至 PHP 来作答。提交到 GitHub。每一份作业我都会认真批改。
 
+### 如何提交作业
+[如何提交作业](如何提交作业.md)
+
 ## 第一周
 ### 第 1 课
 - 数据结构与算法
@@ -156,9 +159,6 @@ Let's plant trees!
 # FAQ 常见问题
 ### 用什么语言？
 这是一节算法课，语言不是根本问题。课件会用JS因为我有准备一些前端算法可视化。作业大家可以用C, CPP, Java, Go, Python, JavaScript, 甚至 PHP。我都可以批改。
-
-### 如何提交作业
-[如何提交作业](如何提交作业.md)
 
 ## 课程视频
 [预习课1：插入排序](https://www.bilibili.com/video/BV1gz411q74e/)  
