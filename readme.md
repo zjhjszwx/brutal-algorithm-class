@@ -161,7 +161,8 @@ Let's plant trees!
 [如何提交作业](如何提交作业.md)
 
 ## 课程视频
-[预习课：插入排序](https://www.bilibili.com/video/BV1gz411q74e/)
+[预习课1：插入排序](https://www.bilibili.com/video/BV1gz411q74e/)  
+[预习课2：递归、函数式编程、动态规划](https://www.bilibili.com/video/BV1Bt4y117tG/)  
 
 
 [GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
