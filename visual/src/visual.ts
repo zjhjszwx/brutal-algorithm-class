@@ -1,15 +1,90 @@
+///////////////
+// Libraries //
+///////////////
+class Channel<T> {
+    private closed: boolean = false;
+    popActions = [];
+    putActions = [];
+
+    put(ele: T) {
+        if (this.closed) {
+            throw new Error('can not put to a closed channel');
+        }
+        // if no pop action awaiting
+        if (this.popActions.length === 0) {
+            if (this.putActions.length >= 1) {
+                throw new Error('put: all promise asleep');
+            }
+            return new Promise((resolve) => {
+                this.putActions.push([resolve, ele]);
+            })
+        } else {
+            let onPop = this.popActions.shift();
+            onPop(ele);
+            return new Promise((resolve) => {
+                resolve()
+            });
+        }
+    }
+
+    pop(): Promise<T> {
+        if (this.closed) {
+            return undefined;
+        }
+        if (this.putActions.length === 0) {
+            if (this.popActions.length >= 1) {
+                throw new Error('pop: all promise asleep');
+            }
+            return new Promise((resolve) => {
+                this.popActions.push(resolve);
+            })
+        } else {
+            let [onPut, ele] = this.putActions.shift();
+            onPut();
+            return new Promise((resolve) => {
+                resolve(ele)
+            });
+            // return ele;
+        }
+    }
+
+    // put to a closed channel throws an error
+    // pop from a closed channel returns undefined
+    // close a closed channel throws an error
+    close() {
+        if (this.closed) {
+            throw Error('can not close a channel twice');
+        }
+        this.closed = true;
+    }
+
+    async*[Symbol.asyncIterator]() {
+        while (!this.closed) {
+            yield await this.pop();
+        }
+    }
+}
+
+function chan<T>() {
+    return new Channel<T>();
+}
+
+///////////////
+// Libraries //
+///////////////
+
 async function paintArray(
     svg: HTMLElement, document: Document,
     initData: Array<number>,
-    insertionArray: Array<number>,
-    mergeArray: Array<number>
+    insertionArray: Channel<number[]>,
+    mergeArray: Channel<[number[], number]>
 ) {
-
+    console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0)
     animatorMergeSort(mergeArray, 'merge', 0, 60)
 
-    async function arrayAnimator(events, className: string, x: number, y: number) {
-        for (let event of events) {
+    async function arrayAnimator(events: Channel<number[]>, className: string, x: number, y: number) {
+        for await (let event of events) {
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
@@ -18,10 +93,10 @@ async function paintArray(
             await sleep(30);
         }
     }
-    async function animatorMergeSort(events, className: string, x: number, y: number) {
+    async function animatorMergeSort(events: Channel<[number[], number]>, className: string, x: number, y: number) {
         let numebrsToRender = initData.map((x) => x);
 
-        for (let [numbers, startIndex] of events) {
+        for await (let [numbers, startIndex] of events) {
             let children = svg.childNodes;
             clearClass(className);
 
@@ -67,7 +142,7 @@ function sleep(time) {
     })
 }
 
-async function InsertionSort(array, reactor) {
+async function InsertionSort(array, reactor: Channel<number[]>) {
 
     function insert(array, number) {
         // [1, 2, 4, 5], 3
@@ -96,33 +171,34 @@ async function InsertionSort(array, reactor) {
     let sortedArray = [];
     for (let i = 0; i < array.length; i++) { // n
         sortedArray = insert(sortedArray, array[i]);
-        reactor.push(sortedArray.concat(array.slice(i + 1)));
+        await reactor.put(sortedArray.concat(array.slice(i + 1)));
     }
     return sortedArray;
 }
 
 
-async function MergeSort(array, reactor) {
+async function MergeSort(array, reactor: Channel<[number[], number]>) {
 
-    function merge(l, r, startIndex) {
+    async function merge(l: number[], r: number[], startIndex: number): Promise<number[]> {
         if (l.length === 0) {
             return r
         }
         if (r.length === 0) {
             return l
         }
-        let shifted = (() => {
+        let shifted: number[] = await (async () => {
             if (l[0] < r[0]) {
-                return l.slice(0, 1).concat(merge(l.slice(1), r, startIndex+1))
+                return l.slice(0, 1).concat(await merge(l.slice(1), r, startIndex+1))
             } else {
-                return r.slice(0, 1).concat(merge(l, r.slice(1), startIndex+1))
+                return r.slice(0, 1).concat(await merge(l, r.slice(1), startIndex+1))
             }
         })();
-        reactor.push([shifted, startIndex]);
+        // console.log(shifted, startIndex)
+        await reactor.put([shifted, startIndex]);
         return shifted;
     }
 
-    async function sort(array, startIndex) {
+    async function sort(array, startIndex): Promise<number[]> {
         if (array.length <= 1) {
             return array;
         }
@@ -131,13 +207,13 @@ async function MergeSort(array, reactor) {
         let r = array.slice(m)
         let sortedL = await sort(l, startIndex)
         let sortedR = await sort(r, startIndex + m)
-        await reactor.push([sortedL.concat(sortedR), startIndex]);
+        await reactor.put([sortedL.concat(sortedR), startIndex]);
         // need global index here to correctly animate
-        let merged = merge(sortedL, sortedR, startIndex)
-        await reactor.push([merged, startIndex]);
+        let merged = await merge(sortedL, sortedR, startIndex)
+        await reactor.put([merged, startIndex]);
         return merged;
     }
-    reactor.push([array, 0]);
+    await reactor.put([array, 0]);
     return await sort(array, 0);
 }
 
@@ -151,11 +227,29 @@ async function main() {
     }
 
     // event queue
-    let insertQueue = [];
-    let mergeQueue = [];
-
-    await InsertionSort(array, insertQueue);
-    await MergeSort(array, mergeQueue);
-    await paintArray(svg, document, array, insertQueue, mergeQueue);
+    let insertQueue = chan<number[]>();
+    let mergeQueue = chan<[number[], number]>();
+    console.log('begin sort', array);
+    let s1 = InsertionSort(array, insertQueue);
+    let s2 = MergeSort(array, mergeQueue);
+    console.log('after sort');
+    let render = paintArray(svg, document, array, insertQueue, mergeQueue);
+    Promise.all([s1, s2, render])
 }
 main();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
