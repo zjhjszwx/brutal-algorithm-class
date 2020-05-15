@@ -1,5 +1,6 @@
 async function paintArray(
     svg: HTMLElement, document: Document,
+    initData: Array<number>,
     insertionArray: Array<number>,
     mergeArray: Array<number>
 ) {
@@ -11,37 +12,32 @@ async function paintArray(
         for (let event of events) {
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
-                // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
-                // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
-                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('width', '3');
-                // @ts-ignore
-                rect.setAttribute('height', number);
-                // @ts-ignore
-                rect.setAttribute('x', `${x + i * 4}`);
-                rect.setAttribute('y', `${y}`);
-                rect.classList.add(className);
-                svg.appendChild(rect);
+                let r = rect(className, x + Number(i) * 4, y, 3, number);
+                svg.appendChild(r);
             }
-            await sleep(100);
+            await sleep(50);
         }
     }
     async function animatorMergeSort(events, className: string, x: number, y: number) {
-        for (let [event, startIndex] of events) {
+        let numebrsToRender = initData.map((x)=>x);
+        console.log(numebrsToRender);
+
+        for (let [numbers, startIndex] of events) {
             let children = svg.childNodes;
             clearClass(className);
-            for (let [i, number] of Object.entries(event)) {
-                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                rect.setAttribute('width', '3');
-                // @ts-ignore
-                rect.setAttribute('height', number);
-                // @ts-ignore
-                rect.setAttribute('x', `${x + startIndex * 4 + i * 4}`);
-                rect.setAttribute('y', `${y}`);
-                rect.classList.add(className);
-                svg.appendChild(rect);
+
+            // put current numbers into previousNumbers
+            for(let i = 0; i < numbers.length; i++) {
+                numebrsToRender[i+startIndex] = numbers[i];
             }
-            await sleep(300);
+            console.log(numbers.length, startIndex, numbers, numebrsToRender);
+
+            
+            for (let [i, number] of Object.entries(numebrsToRender)) {
+                let r = rect(className, x + Number(i) * 4, y, 3, number)
+                svg.appendChild(r);
+            }
+            await sleep(50);
         }
     }
     function empty(ele) {
@@ -52,6 +48,19 @@ async function paintArray(
         while (paras[0]) {
             paras[0].parentNode.removeChild(paras[0]);
         }
+    }
+    function rect(className, x, y, width, height): SVGElementTagNameMap['rect'] {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
+        // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
+        let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('width', width);
+        // @ts-ignore
+        rect.setAttribute('height', height);
+        // @ts-ignore
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        rect.classList.add(className);
+        return rect;
     }
 }
 
@@ -113,7 +122,6 @@ async function MergeSort(array, reactor) {
     }
 
     async function sort(array, startIndex) {
-        console.log(startIndex);
         if (array.length <= 1) {
             return array;
         }
@@ -128,6 +136,7 @@ async function MergeSort(array, reactor) {
         await reactor.push([merged, startIndex]);
         return merged;
     }
+    reactor.push([array, 0]);
     return await sort(array, 0);
 }
 
@@ -137,15 +146,15 @@ async function main() {
     // init an array
     let array = [];
     for (let i = 0; i < 50; i++) {
-        array.push(Math.random() * 50);
+        array.push(Math.floor(Math.random() * 50));
     }
 
     // event queue
     let insertQueue = [];
     let mergeQueue = [];
 
-    console.log(await InsertionSort(array, insertQueue));
-    console.log(await MergeSort(array, mergeQueue));
-    await paintArray(svg, document, insertQueue, mergeQueue);
+    await InsertionSort(array, insertQueue);
+    await MergeSort(array, mergeQueue);
+    await paintArray(svg, document, array, insertQueue, mergeQueue);
 }
 main();
