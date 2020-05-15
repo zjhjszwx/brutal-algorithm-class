@@ -1,15 +1,15 @@
 async function paintArray(
-    svg: HTMLElement, document: Document, 
+    svg: HTMLElement, document: Document,
     insertionArray: Array<number>,
     mergeArray: Array<number>
 ) {
-    
-    await arrayAnimator(insertionArray, 0, 0)
-    await arrayAnimator(mergeArray, 0, 60)
 
-    async function arrayAnimator(events, x, y) {
-        for(let event of events) {
-            empty(svg);
+    arrayAnimator(insertionArray, 'insert', 0, 0)
+    animatorMergeSort(mergeArray, 'merge', 0, 60)
+
+    async function arrayAnimator(events, className: string, x: number, y: number) {
+        for (let event of events) {
+            clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
                 // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
@@ -20,12 +20,39 @@ async function paintArray(
                 // @ts-ignore
                 rect.setAttribute('x', `${x + i * 4}`);
                 rect.setAttribute('y', `${y}`);
+                rect.classList.add(className);
                 svg.appendChild(rect);
             }
             await sleep(100);
         }
     }
-
+    async function animatorMergeSort(events, className: string, x: number, y: number) {
+        for (let [event, startIndex] of events) {
+            let children = svg.childNodes;
+            clearClass(className);
+            for (let [i, number] of Object.entries(event)) {
+                let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                rect.setAttribute('width', '3');
+                // @ts-ignore
+                rect.setAttribute('height', number);
+                // @ts-ignore
+                rect.setAttribute('x', `${x + startIndex * 4 + i * 4}`);
+                rect.setAttribute('y', `${y}`);
+                rect.classList.add(className);
+                svg.appendChild(rect);
+            }
+            await sleep(300);
+        }
+    }
+    function empty(ele) {
+        ele.textContent = undefined;
+    }
+    function clearClass(name: string) {
+        var paras = document.getElementsByClassName(name);
+        while (paras[0]) {
+            paras[0].parentNode.removeChild(paras[0]);
+        }
+    }
 }
 
 function sleep(time) {
@@ -85,30 +112,28 @@ async function MergeSort(array, reactor) {
         }
     }
 
-    async function sort(array) {
+    async function sort(array, startIndex) {
+        console.log(startIndex);
         if (array.length <= 1) {
             return array;
         }
         let m = Math.floor(array.length / 2)
         let l = array.slice(0, m)
         let r = array.slice(m)
-        let sortedL = await sort(l)
-        let sortedR = await sort(r)
+        let sortedL = await sort(l, startIndex)
+        let sortedR = await sort(r, startIndex + m)
+        await reactor.push([sortedL.concat(sortedR), startIndex]);
         // need global index here to correctly animate
         let merged = merge(sortedL, sortedR)
-        reactor.push(merged);
+        await reactor.push([merged, startIndex]);
         return merged;
     }
-    return await sort(array);
-}
-
-function empty(ele) {
-    ele.textContent = undefined;
+    return await sort(array, 0);
 }
 
 async function main() {
     let svg = document.getElementById("svg");
-    
+
     // init an array
     let array = [];
     for (let i = 0; i < 50; i++) {
@@ -119,8 +144,8 @@ async function main() {
     let insertQueue = [];
     let mergeQueue = [];
 
-    await InsertionSort(array, insertQueue);
-    await MergeSort(array, mergeQueue);
+    console.log(await InsertionSort(array, insertQueue));
+    console.log(await MergeSort(array, mergeQueue));
     await paintArray(svg, document, insertQueue, mergeQueue);
 }
 main();
