@@ -19,7 +19,7 @@ async function paintArray(
         }
     }
     async function animatorMergeSort(events, className: string, x: number, y: number) {
-        let numebrsToRender = initData.map((x)=>x);
+        let numebrsToRender = initData.map((x) => x);
         console.log(numebrsToRender);
 
         for (let [numbers, startIndex] of events) {
@@ -27,12 +27,12 @@ async function paintArray(
             clearClass(className);
 
             // put current numbers into previousNumbers
-            for(let i = 0; i < numbers.length; i++) {
-                numebrsToRender[i+startIndex] = numbers[i];
+            for (let i = 0; i < numbers.length; i++) {
+                numebrsToRender[i + startIndex] = numbers[i];
             }
             console.log(numbers.length, startIndex, numbers, numebrsToRender);
 
-            
+
             for (let [i, number] of Object.entries(numebrsToRender)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number)
                 svg.appendChild(r);
@@ -107,18 +107,22 @@ async function InsertionSort(array, reactor) {
 
 async function MergeSort(array, reactor) {
 
-    function merge(l, r) {
+    function merge(l, r, startIndex) {
         if (l.length === 0) {
             return r
         }
         if (r.length === 0) {
             return l
         }
-        if (l[0] < r[0]) {
-            return l.slice(0, 1).concat(merge(l.slice(1), r))
-        } else {
-            return r.slice(0, 1).concat(merge(l, r.slice(1)))
-        }
+        let shifted = (() => {
+            if (l[0] < r[0]) {
+                return l.slice(0, 1).concat(merge(l.slice(1), r, startIndex+1))
+            } else {
+                return r.slice(0, 1).concat(merge(l, r.slice(1), startIndex+1))
+            }
+        })();
+        reactor.push([shifted, startIndex]);
+        return shifted;
     }
 
     async function sort(array, startIndex) {
@@ -132,7 +136,7 @@ async function MergeSort(array, reactor) {
         let sortedR = await sort(r, startIndex + m)
         await reactor.push([sortedL.concat(sortedR), startIndex]);
         // need global index here to correctly animate
-        let merged = merge(sortedL, sortedR)
+        let merged = merge(sortedL, sortedR, startIndex)
         await reactor.push([merged, startIndex]);
         return merged;
     }

@@ -89,19 +89,23 @@ async function InsertionSort(array, reactor) {
     return sortedArray;
 }
 async function MergeSort(array, reactor) {
-    function merge(l, r) {
+    function merge(l, r, startIndex) {
         if (l.length === 0) {
             return r;
         }
         if (r.length === 0) {
             return l;
         }
-        if (l[0] < r[0]) {
-            return l.slice(0, 1).concat(merge(l.slice(1), r));
-        }
-        else {
-            return r.slice(0, 1).concat(merge(l, r.slice(1)));
-        }
+        let shifted = (() => {
+            if (l[0] < r[0]) {
+                return l.slice(0, 1).concat(merge(l.slice(1), r, startIndex + 1));
+            }
+            else {
+                return r.slice(0, 1).concat(merge(l, r.slice(1), startIndex + 1));
+            }
+        })();
+        reactor.push([shifted, startIndex]);
+        return shifted;
     }
     async function sort(array, startIndex) {
         if (array.length <= 1) {
@@ -114,7 +118,7 @@ async function MergeSort(array, reactor) {
         let sortedR = await sort(r, startIndex + m);
         await reactor.push([sortedL.concat(sortedR), startIndex]);
         // need global index here to correctly animate
-        let merged = merge(sortedL, sortedR);
+        let merged = merge(sortedL, sortedR, startIndex);
         await reactor.push([merged, startIndex]);
         return merged;
     }
