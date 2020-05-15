@@ -8,12 +8,11 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(50);
+            await sleep(30);
         }
     }
     async function animatorMergeSort(events, className, x, y) {
         let numebrsToRender = initData.map((x) => x);
-        console.log(numebrsToRender);
         for (let [numbers, startIndex] of events) {
             let children = svg.childNodes;
             clearClass(className);
@@ -21,12 +20,11 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray) {
             for (let i = 0; i < numbers.length; i++) {
                 numebrsToRender[i + startIndex] = numbers[i];
             }
-            console.log(numbers.length, startIndex, numbers, numebrsToRender);
             for (let [i, number] of Object.entries(numebrsToRender)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(50);
+            await sleep(5);
         }
     }
     function empty(ele) {
