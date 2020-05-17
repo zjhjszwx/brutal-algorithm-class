@@ -1,81 +1,20 @@
-///////////////
-// Libraries //
-///////////////
-class Channel {
-    constructor() {
-        this.closed = false;
-        this.popActions = [];
-        this.putActions = [];
-    }
-    put(ele) {
-        if (this.closed) {
-            throw new Error('can not put to a closed channel');
-        }
-        // if no pop action awaiting
-        if (this.popActions.length === 0) {
-            if (this.putActions.length >= 1) {
-                throw new Error('put: all promise asleep');
-            }
-            return new Promise((resolve) => {
-                this.putActions.push([resolve, ele]);
-            });
-        }
-        else {
-            let onPop = this.popActions.shift();
-            onPop(ele);
-            return new Promise((resolve) => {
-                resolve();
-            });
-        }
-    }
-    pop() {
-        if (this.closed) {
-            return undefined;
-        }
-        if (this.putActions.length === 0) {
-            if (this.popActions.length >= 1) {
-                throw new Error('pop: all promise asleep');
-            }
-            return new Promise((resolve) => {
-                this.popActions.push(resolve);
-            });
-        }
-        else {
-            let [onPut, ele] = this.putActions.shift();
-            onPut();
-            return new Promise((resolve) => {
-                resolve(ele);
-            });
-            // return ele;
-        }
-    }
-    // put to a closed channel throws an error
-    // pop from a closed channel returns undefined
-    // close a closed channel throws an error
-    close() {
-        if (this.closed) {
-            throw Error('can not close a channel twice');
-        }
-        this.closed = true;
-    }
-    async *[Symbol.asyncIterator]() {
-        while (!this.closed) {
-            yield await this.pop();
-        }
-    }
-}
-function chan() {
-    return new Channel();
-}
-///////////////
-// Libraries //
-///////////////
-async function paintArray(svg, document, initData, insertionArray, mergeArray) {
+// @ts-nocheck
+import { chan } from './csp.js';
+async function paintArray(svg, document, initData, insertionArray, mergeArray, stop) {
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0);
     animatorMergeSort(mergeArray, 'merge', 0, 60);
     async function arrayAnimator(events, className, x, y) {
         for await (let event of events) {
+            try {
+                if (await needToStop(stop)) {
+                    break;
+                }
+            }
+            catch (e) {
+                console.log(e);
+            }
+            console.log('!');
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
@@ -87,6 +26,9 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray) {
     async function animatorMergeSort(events, className, x, y) {
         let numebrsToRender = initData.map((x) => x);
         for await (let [numbers, startIndex] of events) {
+            // if (needToStop(stop)) {
+            //     break;
+            // }
             let children = svg.childNodes;
             clearClass(className);
             // put current numbers into previousNumbers
@@ -99,6 +41,19 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray) {
             }
             await sleep(5);
         }
+    }
+    async function needToStop(stop) {
+        let unblock = chan();
+        unblock.close();
+        // console.log(stop);
+        // let s = await select([
+        //     [stop, async () => {
+        //         console.log("???");
+        //     }],
+        //     // [unblock, async () => false]
+        // ])
+        // console.log('s', s);
+        return false;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -197,6 +152,16 @@ async function MergeSort(array, reactor) {
     await reactor.put([array, 0]);
     return await sort(array, 0);
 }
+function controlButton(stop) {
+    let button = document.getElementById('controlButton');
+    let clicked = false;
+    button.onclick = async () => {
+        // if(!clicked) {
+        clicked = true;
+        await stop.put(null);
+        // }
+    };
+}
 async function main() {
     let svg = document.getElementById("svg");
     // init an array
@@ -207,11 +172,13 @@ async function main() {
     // event queue
     let insertQueue = chan();
     let mergeQueue = chan();
+    let stop = chan();
+    controlButton(stop);
     console.log('begin sort', array);
     let s1 = InsertionSort(array, insertQueue);
     let s2 = MergeSort(array, mergeQueue);
     console.log('after sort');
-    let render = paintArray(svg, document, array, insertQueue, mergeQueue);
+    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop);
     Promise.all([s1, s2, render]);
 }
 main();

@@ -1,83 +1,12 @@
-///////////////
-// Libraries //
-///////////////
-class Channel<T> {
-    private closed: boolean = false;
-    popActions = [];
-    putActions = [];
-
-    put(ele: T) {
-        if (this.closed) {
-            throw new Error('can not put to a closed channel');
-        }
-        // if no pop action awaiting
-        if (this.popActions.length === 0) {
-            if (this.putActions.length >= 1) {
-                throw new Error('put: all promise asleep');
-            }
-            return new Promise((resolve) => {
-                this.putActions.push([resolve, ele]);
-            })
-        } else {
-            let onPop = this.popActions.shift();
-            onPop(ele);
-            return new Promise((resolve) => {
-                resolve()
-            });
-        }
-    }
-
-    pop(): Promise<T> {
-        if (this.closed) {
-            return undefined;
-        }
-        if (this.putActions.length === 0) {
-            if (this.popActions.length >= 1) {
-                throw new Error('pop: all promise asleep');
-            }
-            return new Promise((resolve) => {
-                this.popActions.push(resolve);
-            })
-        } else {
-            let [onPut, ele] = this.putActions.shift();
-            onPut();
-            return new Promise((resolve) => {
-                resolve(ele)
-            });
-            // return ele;
-        }
-    }
-
-    // put to a closed channel throws an error
-    // pop from a closed channel returns undefined
-    // close a closed channel throws an error
-    close() {
-        if (this.closed) {
-            throw Error('can not close a channel twice');
-        }
-        this.closed = true;
-    }
-
-    async*[Symbol.asyncIterator]() {
-        while (!this.closed) {
-            yield await this.pop();
-        }
-    }
-}
-
-function chan<T>() {
-    return new Channel<T>();
-}
-
-///////////////
-// Libraries //
-///////////////
+// @ts-nocheck
+import { chan, Channel, select } from './csp.js';
 
 async function paintArray(
     svg: HTMLElement, document: Document,
     initData: Array<number>,
     insertionArray: Channel<number[]>,
-    mergeArray: Channel<[number[], number]>
+    mergeArray: Channel<[number[], number]>,
+    stop: Channel<null>
 ) {
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0)
@@ -85,6 +14,15 @@ async function paintArray(
 
     async function arrayAnimator(events: Channel<number[]>, className: string, x: number, y: number) {
         for await (let event of events) {
+            try {
+                if (await needToStop(stop)) {
+                    break;
+                }
+            } catch (e) {
+                console.log(e);
+            }
+            console.log('!')
+
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
@@ -97,6 +35,9 @@ async function paintArray(
         let numebrsToRender = initData.map((x) => x);
 
         for await (let [numbers, startIndex] of events) {
+            // if (needToStop(stop)) {
+            //     break;
+            // }
             let children = svg.childNodes;
             clearClass(className);
 
@@ -111,6 +52,19 @@ async function paintArray(
             }
             await sleep(5);
         }
+    }
+    async function needToStop(stop: Channel<null>) {
+        let unblock = chan<null>();
+        unblock.close();
+        // console.log(stop);
+        // let s = await select([
+        //     [stop, async () => {
+        //         console.log("???");
+        //     }],
+        //     // [unblock, async () => false]
+        // ])
+        // console.log('s', s);
+        return false;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -188,9 +142,9 @@ async function MergeSort(array, reactor: Channel<[number[], number]>) {
         }
         let shifted: number[] = await (async () => {
             if (l[0] < r[0]) {
-                return l.slice(0, 1).concat(await merge(l.slice(1), r, startIndex+1))
+                return l.slice(0, 1).concat(await merge(l.slice(1), r, startIndex + 1))
             } else {
-                return r.slice(0, 1).concat(await merge(l, r.slice(1), startIndex+1))
+                return r.slice(0, 1).concat(await merge(l, r.slice(1), startIndex + 1))
             }
         })();
         // console.log(shifted, startIndex)
@@ -217,6 +171,17 @@ async function MergeSort(array, reactor: Channel<[number[], number]>) {
     return await sort(array, 0);
 }
 
+function controlButton(stop: Channel<null>) {
+    let button = document.getElementById('controlButton')
+    let clicked = false;
+    button.onclick = async () => {
+        // if(!clicked) {
+        clicked = true;
+        await stop.put(null);
+        // }
+    }
+}
+
 async function main() {
     let svg = document.getElementById("svg");
 
@@ -229,27 +194,15 @@ async function main() {
     // event queue
     let insertQueue = chan<number[]>();
     let mergeQueue = chan<[number[], number]>();
+    let stop = chan<null>();
+    controlButton(stop);
+
+
     console.log('begin sort', array);
     let s1 = InsertionSort(array, insertQueue);
     let s2 = MergeSort(array, mergeQueue);
     console.log('after sort');
-    let render = paintArray(svg, document, array, insertQueue, mergeQueue);
+    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop);
     Promise.all([s1, s2, render])
 }
 main();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
