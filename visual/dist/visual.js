@@ -1,28 +1,22 @@
 // @ts-nocheck
 import { chan, select } from './csp.js';
-async function paintArray(svg, document, initData, insertionArray, mergeArray, stop) {
+async function paintArray(svg, document, initData, insertionArray, mergeArray, stop, resume) {
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0);
     animatorMergeSort(mergeArray, 'merge', 0, 60);
     let unblock = chan();
     unblock.close();
     async function arrayAnimator(events, className, x, y) {
+        let stopped = false;
+        let stopResume = await needToStop(stop, resume);
         for await (let event of events) {
-            try {
-                if (await needToStop(unblock, stop)) {
-                    break;
-                }
-            }
-            catch (e) {
-                console.log(e);
-            }
-            console.log('!');
+            await stopResume.pop();
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(100);
+            await sleep(50);
         }
     }
     async function animatorMergeSort(events, className, x, y) {
@@ -44,18 +38,31 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray, s
             await sleep(5);
         }
     }
-    async function needToStop(unblock, stop) {
-        let s = await select([
-            [stop, async () => {
-                    return true;
-                }],
-            [unblock, async () => {
-                    console.log('unblock');
-                    return false;
-                }]
-        ]);
-        console.log(s);
-        return s;
+    async function needToStop(stop, resume) {
+        let stopResume = chan();
+        let stopped = false;
+        (async () => {
+            while (1) {
+                await select([
+                    [resume, async () => {
+                            stopped = false;
+                            await stopResume.put();
+                        }],
+                    [stop, async () => {
+                            stopped = true;
+                        }]
+                ], async () => {
+                    if (stopped) {
+                        await resume.pop();
+                        stopped = false;
+                    }
+                    else {
+                        await stopResume.put();
+                    }
+                });
+            }
+        })();
+        return stopResume;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -154,15 +161,20 @@ async function MergeSort(array, reactor) {
     await reactor.put([array, 0]);
     return await sort(array, 0);
 }
-function controlButton(stop) {
+function controlButton(stop, resume) {
     let button = document.getElementById('controlButton');
-    let clicked = false;
+    let stopped = false;
     button.onclick = async () => {
         // if(!clicked) {
-        console.log('clicked');
-        clicked = true;
-        await stop.close();
-        // }
+        console.log('clicked', stopped, '->', !stopped);
+        stopped = !stopped;
+        if (stopped) {
+            await stop.put(null);
+        }
+        else {
+            console.log('resume');
+            await resume.put(null);
+        }
     };
 }
 async function main() {
@@ -176,12 +188,13 @@ async function main() {
     let insertQueue = chan();
     let mergeQueue = chan();
     let stop = chan();
-    controlButton(stop);
+    let resume = chan();
+    controlButton(stop, resume);
     console.log('begin sort', array);
     let s1 = InsertionSort(array, insertQueue);
     let s2 = MergeSort(array, mergeQueue);
     console.log('after sort');
-    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop);
+    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop, resume);
     Promise.all([s1, s2, render]);
 }
 main();

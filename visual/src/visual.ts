@@ -6,7 +6,8 @@ async function paintArray(
     initData: Array<number>,
     insertionArray: Channel<number[]>,
     mergeArray: Channel<[number[], number]>,
-    stop: Channel<null>
+    stop: Channel<null>,
+    resume: Channel<null>
 ) {
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0)
@@ -15,22 +16,16 @@ async function paintArray(
     unblock.close();
 
     async function arrayAnimator(events: Channel<number[]>, className: string, x: number, y: number) {
+        let stopped = false;
+        let stopResume = await needToStop(stop, resume);
         for await (let event of events) {
-            try {
-                if (await needToStop(unblock, stop)) {
-                    break;
-                }
-            } catch (e) {
-                console.log(e);
-            }
-            console.log('!')
-
+            await stopResume.pop();
             clearClass(className);
             for (let [i, number] of Object.entries(event)) {
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(100);
+            await sleep(50);
         }
     }
     async function animatorMergeSort(events: Channel<[number[], number]>, className: string, x: number, y: number) {
@@ -55,18 +50,33 @@ async function paintArray(
             await sleep(5);
         }
     }
-    async function needToStop(unblock: Channel<null>, stop: Channel<null>) {
-        let s = await select([
-            [stop, async () => {
-                return true
-            }],
-            [unblock, async () => {
-                console.log('unblock');
-                return false
-            }]
-        ])
-        console.log(s);
-        return s;
+    async function needToStop(stop: Channel<null>, resume: Channel<null>) {
+        let stopResume = chan();
+        let stopped = false;
+        (async () => {
+            while (1) {
+                await select(
+                    [
+                        [resume, async () => {
+                            stopped = false;
+                            await stopResume.put();
+                        }],
+                        [stop, async () => {
+                            stopped = true;
+                        }]
+                    ],
+                    async () => {
+                        if(stopped) {
+                            await resume.pop();
+                            stopped = false;
+                        } else {
+                            await stopResume.put();
+                        }
+                    }
+                )
+            }
+        })();
+        return stopResume;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -173,15 +183,20 @@ async function MergeSort(array, reactor: Channel<[number[], number]>) {
     return await sort(array, 0);
 }
 
-function controlButton(stop: Channel<null>) {
+function controlButton(stop: Channel<null>, resume: Channel<null>) {
     let button = document.getElementById('controlButton')
-    let clicked = false;
+    let stopped = false;
     button.onclick = async () => {
         // if(!clicked) {
-        console.log('clicked');
-        clicked = true;
-        await stop.close();
-        // }
+        console.log('clicked', stopped, '->', !stopped);
+        stopped = !stopped;
+        if (stopped) {
+            await stop.put(null);
+        } else {
+            console.log('resume')
+            await resume.put(null);
+        }
+
     }
 }
 
@@ -198,14 +213,15 @@ async function main() {
     let insertQueue = chan<number[]>();
     let mergeQueue = chan<[number[], number]>();
     let stop = chan<null>();
-    controlButton(stop);
+    let resume = chan<null>();
+    controlButton(stop, resume);
 
 
     console.log('begin sort', array);
     let s1 = InsertionSort(array, insertQueue);
     let s2 = MergeSort(array, mergeQueue);
     console.log('after sort');
-    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop);
+    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop, resume);
     Promise.all([s1, s2, render])
 }
 main();

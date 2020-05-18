@@ -32,10 +32,10 @@ export class Channel {
             });
         }
     }
-    // checks if a channel is ready to be ready but dooes not read it
+    // checks if a channel is ready to be read but dooes not read it
     // it returns only after the channel is ready
     async ready(i) {
-        if (this.popActions.length > 0 || this.closed) {
+        if (this.putActions.length > 0 || this.closed) {
             return i;
         }
         else {
@@ -134,3 +134,45 @@ export async function select(channels, defaultCase) {
     let ele = await channels[i][0].pop();
     return await channels[i][1](ele);
 }
+// This is a semaphore implementation that depends on a event emitter.
+// If my channel implementation is correct, one should easily implement a semaphore out of a channel.
+// export function Semaphore(size: number) {
+//     let pending = 0;
+//     let unlocker = new EventEmitter();
+//     function onEnterLock(resolve) {
+//         if (pending < size) {
+//             pending++;
+//             resolve();
+//         } else {
+//             listen(resolve);
+//         }
+//     }
+//     function listen(resolve) {
+//         unlocker.once('', () => {
+//             onEnterLock(resolve);
+//         })
+//     }
+//     function lock() {
+//         return new Promise((resolve) => {
+//             onEnterLock(resolve);
+//         })
+//     }
+//     async function unlock() {
+//         // console.log('unlock');
+//         pending--;
+//         unlocker.emit('')
+//     }
+//     type AsyncFunction = () => Promise<any>;
+//     return {
+//         async run(f: AsyncFunction) {
+//             await lock();
+//             // console.log('after lock');
+//             let r = await f();
+//             // console.log('pre unlock');
+//             await unlock();
+//             return r;
+//         },
+//         lock,
+//         unlock
+//     }
+// }
