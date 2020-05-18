@@ -1,13 +1,15 @@
 // @ts-nocheck
-import { chan } from './csp.js';
+import { chan, select } from './csp.js';
 async function paintArray(svg, document, initData, insertionArray, mergeArray, stop) {
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0);
     animatorMergeSort(mergeArray, 'merge', 0, 60);
+    let unblock = chan();
+    unblock.close();
     async function arrayAnimator(events, className, x, y) {
         for await (let event of events) {
             try {
-                if (await needToStop(stop)) {
+                if (await needToStop(unblock, stop)) {
                     break;
                 }
             }
@@ -20,7 +22,7 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray, s
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(30);
+            await sleep(100);
         }
     }
     async function animatorMergeSort(events, className, x, y) {
@@ -42,18 +44,18 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray, s
             await sleep(5);
         }
     }
-    async function needToStop(stop) {
-        let unblock = chan();
-        unblock.close();
-        // console.log(stop);
-        // let s = await select([
-        //     [stop, async () => {
-        //         console.log("???");
-        //     }],
-        //     // [unblock, async () => false]
-        // ])
-        // console.log('s', s);
-        return false;
+    async function needToStop(unblock, stop) {
+        let s = await select([
+            [stop, async () => {
+                    return true;
+                }],
+            [unblock, async () => {
+                    console.log('unblock');
+                    return false;
+                }]
+        ]);
+        console.log(s);
+        return s;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -157,8 +159,9 @@ function controlButton(stop) {
     let clicked = false;
     button.onclick = async () => {
         // if(!clicked) {
+        console.log('clicked');
         clicked = true;
-        await stop.put(null);
+        await stop.close();
         // }
     };
 }

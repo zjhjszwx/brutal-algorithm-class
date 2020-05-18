@@ -11,11 +11,13 @@ async function paintArray(
     console.log('render loop');
     arrayAnimator(insertionArray, 'insert', 0, 0)
     animatorMergeSort(mergeArray, 'merge', 0, 60)
+    let unblock = chan<null>();
+    unblock.close();
 
     async function arrayAnimator(events: Channel<number[]>, className: string, x: number, y: number) {
         for await (let event of events) {
             try {
-                if (await needToStop(stop)) {
+                if (await needToStop(unblock, stop)) {
                     break;
                 }
             } catch (e) {
@@ -28,7 +30,7 @@ async function paintArray(
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(30);
+            await sleep(100);
         }
     }
     async function animatorMergeSort(events: Channel<[number[], number]>, className: string, x: number, y: number) {
@@ -53,18 +55,18 @@ async function paintArray(
             await sleep(5);
         }
     }
-    async function needToStop(stop: Channel<null>) {
-        let unblock = chan<null>();
-        unblock.close();
-        // console.log(stop);
-        // let s = await select([
-        //     [stop, async () => {
-        //         console.log("???");
-        //     }],
-        //     // [unblock, async () => false]
-        // ])
-        // console.log('s', s);
-        return false;
+    async function needToStop(unblock: Channel<null>, stop: Channel<null>) {
+        let s = await select([
+            [stop, async () => {
+                return true
+            }],
+            [unblock, async () => {
+                console.log('unblock');
+                return false
+            }]
+        ])
+        console.log(s);
+        return s;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -176,8 +178,9 @@ function controlButton(stop: Channel<null>) {
     let clicked = false;
     button.onclick = async () => {
         // if(!clicked) {
+        console.log('clicked');
         clicked = true;
-        await stop.put(null);
+        await stop.close();
         // }
     }
 }
