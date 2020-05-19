@@ -1,8 +1,63 @@
 // @ts-nocheck
 import { chan, select } from './csp.js';
+function SortVisualizationComponent(id, arrays) {
+    let ele = document.getElementById(id);
+    let stop = chan();
+    let resume = chan();
+    // Animation SVG
+    CreateArrayAnimationSVGComponent(ele, id + 'animation', 0, 0)(arrays, stop, resume);
+    // Stop/Resume Button
+    let button = ele.getElementsByTagName('button')[0];
+    let stopped = false;
+    button.addEventListener('click', async () => {
+        // if(!clicked) {
+        console.log('clicked', stopped, '->', !stopped);
+        stopped = !stopped;
+        if (stopped) {
+            button.textContent = 'resume';
+            await stop.put(null);
+        }
+        else {
+            button.textContent = 'stop';
+            await resume.put(null);
+        }
+    });
+}
+function CreateArrayAnimationSVGComponent(parent, id, x, y) {
+    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.id = id;
+    parent.insertBefore(svg, parent.firstChild);
+    return async (arrays, stop, resume) => {
+        let waitToResume = await needToStop(stop, resume);
+        for await (let array of arrays) {
+            await waitToResume.pop();
+            while (svg.lastChild) {
+                svg.removeChild(svg.lastChild);
+            }
+            for (let [i, number] of Object.entries(array)) {
+                let r = rect(x + Number(i) * 4, y, 3, number);
+                svg.appendChild(r);
+            }
+            await sleep(20);
+        }
+    };
+    function rect(x, y, width, height) {
+        // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
+        // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
+        let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        rect.setAttribute('width', width);
+        // @ts-ignore
+        rect.setAttribute('height', height);
+        // @ts-ignore
+        rect.setAttribute('x', x);
+        rect.setAttribute('y', y);
+        // rect.classList.add(className);
+        return rect;
+    }
+}
 async function paintArray(svg, document, initData, insertionArray, mergeArray, stop, resume) {
     console.log('render loop');
-    arrayAnimator(insertionArray, 'insert', 0, 0);
+    // arrayAnimator(insertionArray, 'insert', 0, 0)
     animatorMergeSort(mergeArray, 'merge', 0, 60);
     let unblock = chan();
     unblock.close();
@@ -16,7 +71,7 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray, s
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(50);
+            await sleep(20);
         }
     }
     async function animatorMergeSort(events, className, x, y) {
@@ -35,34 +90,8 @@ async function paintArray(svg, document, initData, insertionArray, mergeArray, s
                 let r = rect(className, x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(5);
+            await sleep(3);
         }
-    }
-    async function needToStop(stop, resume) {
-        let stopResume = chan();
-        let stopped = false;
-        (async () => {
-            while (1) {
-                await select([
-                    [resume, async () => {
-                            stopped = false;
-                            await stopResume.put();
-                        }],
-                    [stop, async () => {
-                            stopped = true;
-                        }]
-                ], async () => {
-                    if (stopped) {
-                        await resume.pop();
-                        stopped = false;
-                    }
-                    else {
-                        await stopResume.put();
-                    }
-                });
-            }
-        })();
-        return stopResume;
     }
     function empty(ele) {
         ele.textContent = undefined;
@@ -178,7 +207,7 @@ function controlButton(stop, resume) {
     };
 }
 async function main() {
-    let svg = document.getElementById("svg");
+    // let svg = document.getElementById("svg");
     // init an array
     let array = [];
     for (let i = 0; i < 50; i++) {
@@ -189,12 +218,57 @@ async function main() {
     let mergeQueue = chan();
     let stop = chan();
     let resume = chan();
-    controlButton(stop, resume);
+    // controlButton(stop, resume);
     console.log('begin sort', array);
     let s1 = InsertionSort(array, insertQueue);
     let s2 = MergeSort(array, mergeQueue);
     console.log('after sort');
-    let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop, resume);
-    Promise.all([s1, s2, render]);
+    // let render = paintArray(svg, document, array, insertQueue, mergeQueue, stop, resume);
+    // Promise.all([s1, s2, render])
+    let mergeQueue2 = (() => {
+        let c = chan();
+        (async () => {
+            let numebrsToRender = [].concat(array);
+            await c.put(numebrsToRender);
+            while (1) {
+                let [numbers, startIndex] = await mergeQueue.pop();
+                console.log(numbers);
+                for (let i = 0; i < numbers.length; i++) {
+                    numebrsToRender[i + startIndex] = numbers[i];
+                }
+                await c.put(numebrsToRender);
+            }
+        })();
+        return c;
+    })();
+    console.log(mergeQueue2);
+    SortVisualizationComponent('insertion-sort', insertQueue);
+    SortVisualizationComponent('merge-sort', mergeQueue2);
 }
 main();
+async function needToStop(stop, resume) {
+    let stopResume = chan();
+    let stopped = false;
+    (async () => {
+        while (1) {
+            await select([
+                [resume, async () => {
+                        stopped = false;
+                        await stopResume.put();
+                    }],
+                [stop, async () => {
+                        stopped = true;
+                    }]
+            ], async () => {
+                if (stopped) {
+                    await resume.pop();
+                    stopped = false;
+                }
+                else {
+                    await stopResume.put();
+                }
+            });
+        }
+    })();
+    return stopResume;
+}
