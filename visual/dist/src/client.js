@@ -1,49 +1,38 @@
 // Create WebSocket connection.
-
-import { chan, SelectableChannel } from "./csp.js";
-
-
-class WC<T> implements SelectableChannel<T> {
-
-    constructor(
-        private receive: SelectableChannel<T>, 
-        private readyChan: SelectableChannel<T>,
-        private socket: WebSocket) {
-
+import { chan } from "./csp.js";
+class WC {
+    constructor(receive, readyChan, socket) {
+        this.receive = receive;
+        this.readyChan = readyChan;
+        this.socket = socket;
     }
-
-    async put(ele: T): Promise<void> {
+    async put(ele) {
         return this.socket.send(`${ele}`);
     }
-    pop(): Promise<T> {
-        return this.receive.pop()
+    pop() {
+        return this.receive.pop();
     }
     close() {
         this.socket.close();
     }
-    closed(): boolean {
+    closed() {
         return this.socket.readyState === this.socket.CLOSED;
     }
-    async ready(i: number): Promise<number> {
-        if(this.closed()) {
+    async ready(i) {
+        if (this.closed()) {
             return i;
         }
-        await this.readyChan.pop()
+        await this.readyChan.pop();
         return i;
     }
-    // [Symbol.asyncIterator]() {
-    //     return this;
-    // }
 }
-
-export async function WebSocketClient(url: string): Promise<WC<any>> {
-
+export async function WebSocketClient(url) {
     const socket = new WebSocket(url);
     await new Promise((resolve) => {
         socket.onopen = (event) => {
             console.log(event);
-            resolve()
-        }
+            resolve();
+        };
     });
     let receive = chan();
     let ready = chan();

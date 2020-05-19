@@ -49,7 +49,7 @@ function CreateArrayAnimationSVGComponent(
                 let r = rect(x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(10);
+            await sleep(300);
         }
     }
 
@@ -67,80 +67,6 @@ function CreateArrayAnimationSVGComponent(
         return rect;
     }
 }
-
-// async function paintArray(
-//     svg: HTMLElement, document: Document,
-//     initData: Array<number>,
-//     insertionArray: Channel<number[]>,
-//     mergeArray: Channel<[number[], number]>,
-//     stop: Channel<null>,
-//     resume: Channel<null>
-// ) {
-//     console.log('render loop');
-//     // arrayAnimator(insertionArray, 'insert', 0, 0)
-//     animatorMergeSort(mergeArray, 'merge', 0, 60)
-//     let unblock = chan<null>();
-//     unblock.close();
-
-//     async function arrayAnimator(events: Channel<number[]>, className: string, x: number, y: number) {
-//         let stopped = false;
-//         let stopResume = await needToStop(stop, resume);
-//         for await (let event of events) {
-//             await stopResume.pop();
-//             clearClass(className);
-//             for (let [i, number] of Object.entries(event)) {
-//                 let r = rect(className, x + Number(i) * 4, y, 3, number);
-//                 svg.appendChild(r);
-//             }
-//             await sleep(20);
-//         }
-//     }
-//     async function animatorMergeSort(events: Channel<[number[], number]>, className: string, x: number, y: number) {
-//         let numebrsToRender = initData.map((x) => x);
-
-//         for await (let [numbers, startIndex] of events) {
-//             // if (needToStop(stop)) {
-//             //     break;
-//             // }
-//             let children = svg.childNodes;
-//             clearClass(className);
-
-//             // put current numbers into previousNumbers
-//             for (let i = 0; i < numbers.length; i++) {
-//                 numebrsToRender[i + startIndex] = numbers[i];
-//             }
-
-//             for (let [i, number] of Object.entries(numebrsToRender)) {
-//                 let r = rect(className, x + Number(i) * 4, y, 3, number)
-//                 svg.appendChild(r);
-//             }
-//             await sleep(3);
-//         }
-//     }
-
-//     function empty(ele) {
-//         ele.textContent = undefined;
-//     }
-//     function clearClass(name: string) {
-//         var paras = document.getElementsByClassName(name);
-//         while (paras[0]) {
-//             paras[0].parentNode.removeChild(paras[0]);
-//         }
-//     }
-//     function rect(className, x, y, width, height): SVGElementTagNameMap['rect'] {
-//         // https://developer.mozilla.org/en-US/docs/Web/API/Document/createElementNS
-//         // https://stackoverflow.com/questions/12786797/draw-rectangles-dynamically-in-svg
-//         let rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-//         rect.setAttribute('width', width);
-//         // @ts-ignore
-//         rect.setAttribute('height', height);
-//         // @ts-ignore
-//         rect.setAttribute('x', x);
-//         rect.setAttribute('y', y);
-//         rect.classList.add(className);
-//         return rect;
-//     }
-// }
 
 function sleep(time) {
     return new Promise((resolve) => {
@@ -285,14 +211,19 @@ async function main() {
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
 
-    let client = await WebSocketClient('ws://localhost:8081');
-    let i = 0;
-    while(++i) {
-        await client.send(i);
-        console.log(1);
-        console.log(await client.receive());
-        
-    }
+    // let client = await WebSocketClient('ws://localhost:8081');
+    // let i = 0;
+    // while(++i) {
+    //     // await client.put(i);
+    //     // console.log(1);
+    //     // Nice, now I have seletable web socket connections
+    //     // Now just need to implement a shuffle algorithm for selection fairness
+    //     let x = await select([
+    //         [client, (ele) => ele],
+    //         [mergeQueue2, (ele) => ele]
+    //     ])
+    //     console.log('pop', x);
+    // }
 }
 main();
 
