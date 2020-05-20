@@ -44,3 +44,15 @@ export async function WebSocketClient(url) {
     });
     return new WC(receive, ready, socket);
 }
+export class GraphQLSubscriptionClient {
+    constructor(webSocketClient) {
+        this.webSocketClient = webSocketClient;
+    }
+    async pop() {
+        return this.webSocketClient.pop();
+    }
+}
+export async function GraphQLSubscription(document, webSocketClient) {
+    await webSocketClient.put(document);
+    return new GraphQLSubscriptionClient(webSocketClient);
+}

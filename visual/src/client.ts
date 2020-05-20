@@ -54,3 +54,19 @@ export async function WebSocketClient(url: string): Promise<WC<any>> {
     });
     return new WC(receive, ready, socket);
 }
+
+export class GraphQLSubscriptionClient implements SelectableChannel {
+
+    constructor(private webSocketClient: WC<string>) {}
+
+    async pop() {
+        return this.webSocketClient.pop()
+    }
+
+}
+
+
+export async function GraphQLSubscription(document: string, webSocketClient: WC<string>): Promise<GraphQLSubscriptionClient> {
+    await webSocketClient.put(document);
+    return new GraphQLSubscriptionClient(webSocketClient);
+}

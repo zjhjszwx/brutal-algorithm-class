@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { chan, select } from 'https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js';
-import { WebSocketClient } from './client.js';
+import { WebSocketClient, GraphQLSubscription } from './client.js';
 function SortVisualizationComponent(id, arrays) {
     let ele = document.getElementById(id);
     let stop = chan();
@@ -187,15 +187,18 @@ async function main() {
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
     let client = await WebSocketClient('ws://localhost:8081');
-    let i = 0;
-    while (++i) {
-        await sleep(500);
-        await client.put(i);
-        // console.log(1);
-        // Nice, now I have seletable web socket connections
-        // Now just need to implement a shuffle algorithm for selection fairness
-        let x = await client.pop();
-        console.log('pop', x);
+    // let i = 0;
+    // while(++i) {
+    //     await sleep(500);
+    //     await client.put(i);
+    //     // Nice, now I have seletable web socket connections
+    //     // Now just need to implement a shuffle algorithm for selection fairness
+    //     let x = await client.pop();
+    //     console.log('pop', x);
+    // }
+    let subscription = await GraphQLSubscription(`subscription {hello}`, client);
+    while (1) {
+        console.log(await subscription.pop());
     }
 }
 main();

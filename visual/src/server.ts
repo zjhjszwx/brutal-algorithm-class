@@ -1,11 +1,39 @@
 import { serve, ServerRequest  } from "https://deno.land/std/http/server.ts";
-import { Channel } from "https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js";
+import { Channel, sleep } from "https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js";
+import graphql from "https://creatcodebuild.github.io/graphql-projects/deno-graphql-port/dist/graphql.js";
 
 import {
     acceptWebSocket,
     isWebSocketCloseEvent,
     isWebSocketPingEvent,
 } from "https://deno.land/std/ws/mod.ts";
+
+
+try {
+    var schema = graphql.buildSchema(`
+    schema {
+        subscription: Subscription
+        query: Query
+    }
+    type Query {
+        x: String
+    }
+    type Subscription {
+        hello: String
+    }
+  `);
+} catch(e) {
+    console.error(e.message, e.locations);
+    Deno.exit(1);
+}
+
+
+var root = { 
+  hello: () => 'Hello world!'
+};
+
+let x = await graphql.graphql(schema, `subscription {hello}`, root)
+console.log(x)
 
 /** websocket echo server */
 const port = Deno.args[0] || "8081";
@@ -37,7 +65,10 @@ async function servePerRequest(req: ServerRequest) {
                 if (typeof ev === "string") {
                     // text message
                     console.log("ws:Text", ev);
-                    await sock.send(ev);
+                    while(1) {
+                        await sleep(500)
+                        await sock.send(JSON.stringify(await graphql.graphql(schema, ev, root)));
+                    }
                 } else if (ev instanceof Uint8Array) {
                     // binary message
                     console.log("ws:Binary", ev);
