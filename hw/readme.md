@@ -15,8 +15,19 @@ function Product(M1: Matrix<W, H>， M2: Matrix<H, W>): Matrix<W, W>
 
 实现完成之后，请分析或者统计算法的随机分布以及标准差。分析可以写成注释。
 
-## 3. 快排，归并排序
-请使用递归方式实现这两个函数。
+## 3. 链表（附加题）
+请使用递归的方式实现链表。
+```ts
+interface LinkedList {
+    length(): number        // 得到链表长度
+    append(element)         // 在链表末尾追加元素
+    append_head(element)    // 在链表头部追加元素
+    insert(element, index)  // 在链表 index-1 和 index 之间插入一个元素
+                            // insert(element, 0) 等于 append_head(element)
+                            // insert(element, length()) 等于 append(element)
+    get(index)              // 得到 index 位的元素
+}
+```
 
 
 ## 备注
