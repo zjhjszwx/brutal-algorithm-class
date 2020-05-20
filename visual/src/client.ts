@@ -1,6 +1,6 @@
 // Create WebSocket connection.
-
-import { chan, SelectableChannel } from "./csp.js";
+// @ts-ignore
+import { chan, SelectableChannel } from "https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js";
 
 
 class WC<T> implements SelectableChannel<T> {

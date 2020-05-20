@@ -1,5 +1,6 @@
 // Create WebSocket connection.
-import { chan } from "./csp.js";
+// @ts-ignore
+import { chan } from "https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js";
 class WC {
     constructor(receive, readyChan, socket) {
         this.receive = receive;
