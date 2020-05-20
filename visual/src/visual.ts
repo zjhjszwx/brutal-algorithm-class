@@ -212,6 +212,7 @@ async function main() {
     SortVisualizationComponent('merge-sort', mergeQueue2);
 
     let client = await WebSocketClient('ws://localhost:8081');
+    let client2 = await WebSocketClient('ws://localhost:8081');
     // let i = 0;
     // while(++i) {
     //     await sleep(500);
@@ -223,8 +224,10 @@ async function main() {
     // }
 
     let subscription = await GraphQLSubscription(`subscription {hello}`, client);
-    while(1) {
-        console.log(await subscription.pop());
+    while(i) {
+        console.log(1, await subscription.pop());
+        console.log(2, await subscription2.pop());
+        let subscription2 = await GraphQLSubscription(`mutation { hello(text: "${i}") }`, client2);
     }
 }
 main();
