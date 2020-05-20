@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { chan, select } from './csp.js';
+import { chan, select } from 'https://creatcodebuild.github.io/graphql-projects/csp/src/csp.ts';
 function SortVisualizationComponent(id, arrays) {
     let ele = document.getElementById(id);
     let stop = chan();

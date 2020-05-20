@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { chan, Channel, select } from './csp.js';
+import { chan, Channel, select } from 'https://creatcodebuild.github.io/graphql-projects/csp/src/csp.ts';
 import { WebSocketClient } from './client.js';
 
 function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
