@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { chan, select } from 'https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js';
+import { chan, select } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
 import { WebSocketClient, GraphQLSubscription } from './client.js';
 function SortVisualizationComponent(id, arrays) {
     let ele = document.getElementById(id);
