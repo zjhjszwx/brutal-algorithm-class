@@ -10,15 +10,23 @@ function Product(M1: Matrix<W, H1>， M2: Matrix<H2, W>): Matrix<W, W>
 ```
 `Matrix`类型的实现可以自定义，通常是二维数组。
 
-```
-[[1, 2, 3]
- [4, 5, 6]]
-3 x 2 // Width = 3, Height = 2
+```js
+M1 = [
+    [1, 2, 3]
+    [4, 5, 6]]
+// 3 x 2 // Width = 3, Height = 2
 
-[[1,2]
- [3,4]
- [5,6]]
-2 x 3 // Width =
+M2 = [
+    [1,2]
+    [3,4]
+    [5,6]]
+// 2 x 3 // Width =
+
+// Test
+equal(Product(M1, M2), [
+    [22, 26],
+    [? , ?]
+]) // print true
 ```
 
 ## 2. Shuffle 洗牌
