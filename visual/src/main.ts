@@ -206,7 +206,7 @@ async function main() {
 
     // SortVisualizationComponent('insertion-sort', insertQueue);
     // SortVisualizationComponent('merge-sort', mergeQueue2);
-    UI(stop, resume);
+    UI(stop, resume, array);
 
 }
 main();
@@ -240,13 +240,14 @@ async function needToStop(stop: Channel<null>, resume: Channel<null>) {
     return stopResume;
 }
 
-function UI(stop: Channel, resume: Channel) {
+function UI(stop: Channel, resume: Channel, array) {
     Vue.component('sort-visualization', {
         props: ['name'],
         data() {
             return {
                 stopped: false,
-                state: 'stop'
+                state: 'stop',
+                array: []
             }
         },
         methods: {
@@ -256,6 +257,7 @@ function UI(stop: Channel, resume: Channel) {
                     this.state = 'resume'
                     await stop.put(null);
                 } else {
+                    console.log(this.array);
                     this.state = 'stop'
                     await resume.put(null);
                 }
@@ -265,12 +267,19 @@ function UI(stop: Channel, resume: Channel) {
         <div>
         <div> {{name}} </div>
         <button v-on:click="click"> {{ state }} </button>
+        <svg>
+            <rect v-for="i in array" x="120" width="5" height="10" rx="15" />
+        </svg>
         </div>
         `
     });
     console.log('UI');
 
-    new Vue({ el: '#insertion-sort' })
+    console.log(array);
+    let iSort = new Vue({
+        el: '#insertion-sort'
+    });
+    iSort.array = array;
     new Vue({ el: '#merge-sort' })
 }
 

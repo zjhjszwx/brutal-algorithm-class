@@ -182,7 +182,7 @@ async function main() {
     console.log(mergeQueue2);
     // SortVisualizationComponent('insertion-sort', insertQueue);
     // SortVisualizationComponent('merge-sort', mergeQueue2);
-    UI(stop, resume);
+    UI(stop, resume, array);
 }
 main();
 async function needToStop(stop, resume) {
@@ -211,13 +211,14 @@ async function needToStop(stop, resume) {
     })();
     return stopResume;
 }
-function UI(stop, resume) {
+function UI(stop, resume, array) {
     Vue.component('sort-visualization', {
         props: ['name'],
         data() {
             return {
                 stopped: false,
-                state: 'stop'
+                state: 'stop',
+                array: []
             };
         },
         methods: {
@@ -228,6 +229,7 @@ function UI(stop, resume) {
                     await stop.put(null);
                 }
                 else {
+                    console.log(this.array);
                     this.state = 'stop';
                     await resume.put(null);
                 }
@@ -237,10 +239,17 @@ function UI(stop, resume) {
         <div>
         <div> {{name}} </div>
         <button v-on:click="click"> {{ state }} </button>
+        <svg>
+            <rect v-for="i in array" x="120" width="5" height="10" rx="15" />
+        </svg>
         </div>
         `
     });
     console.log('UI');
-    new Vue({ el: '#insertion-sort' });
+    console.log(array);
+    let iSort = new Vue({
+        el: '#insertion-sort'
+    });
+    iSort.array = array;
     new Vue({ el: '#merge-sort' });
 }
