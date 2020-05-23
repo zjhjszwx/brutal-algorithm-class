@@ -34,6 +34,22 @@ equal(Product(M1, M2), [
 
 实现完成之后，请分析或者统计算法的随机分布以及标准差。分析可以写成注释。
 
+```js
+function mergeX(array, mergeFunc) {
+    if (array.length <= 1) {
+        return array;
+    }
+    // left, right
+    let [l, r] = split(array);
+    let sortL = mergeSort(l);
+    let sortR = mergeSort(r);
+    return mergeFunc(sortL, sortR);
+}
+
+mergeX([], mergeInOrder)    // merge sort
+mergeX([], mergeRandom)     // merge shuffle
+```
+
 ## 3. 链表（附加题）
 请使用递归的方式实现头尾指针链表。
 ```ts

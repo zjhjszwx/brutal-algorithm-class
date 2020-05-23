@@ -79,7 +79,6 @@ list.get(5);
 console.log('len', list.length());
 
 
-
 // coupling（结对）    耦合：不该在一起的在一起，孽缘
 // cohesion（和谐）    聚合：该在一起
 // length 长度
