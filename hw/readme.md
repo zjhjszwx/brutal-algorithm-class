@@ -35,9 +35,11 @@ equal(Product(M1, M2), [
 实现完成之后，请分析或者统计算法的随机分布以及标准差。分析可以写成注释。
 
 ## 3. 链表（附加题）
-请使用递归的方式实现链表。
+请使用递归的方式实现头尾指针链表。
 ```ts
 interface LinkedList {
+    head: Node
+    tail: Node
     length(): number        // 得到链表长度
     append(element)         // 在链表末尾追加元素
     append_head(element)    // 在链表头部追加元素
@@ -45,6 +47,11 @@ interface LinkedList {
                             // insert(element, 0) 等于 append_head(element)
                             // insert(element, length()) 等于 append(element)
     get(index)              // 得到 index 位的元素
+}
+
+interface Node<T> {
+    element: T
+    next: Node<T> | null
 }
 ```
 
