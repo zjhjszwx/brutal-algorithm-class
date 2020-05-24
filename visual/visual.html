@@ -1,21 +1,29 @@
 <html>
 
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script type="module" src="./dist/main.js"></script>
 </head>
 
+
 <body>
-    <!-- <svg id="svg" viewBox="0 0 220 120"> -->
-    <!-- <rect width="5" height="100"/> -->
-    <!-- </svg>
-    <button id="controlButton">stop</button> -->
-    <sort-visualization id="insertion-sort"
-        name="Insertion Sort"
-    ></sort-visualization>
-    <sort-visualization id="merge-sort"
-        name="Merge Sort"
-    ></sort-visualization>
+    <template id="sort-visualization">
+        <style>
+            p {
+                color: white;
+                background-color: #666;
+                padding: 5px;
+            }
+        </style>
+        <slot name="sort-name">Sort Name</slot>
+        <button>stop</button>
+        <svg></svg>
+    </template>
+    <sort-visualization id="insertion-sort">
+        <p slot="sort-name">Insertion Sort</p>
+    </sort-visualization>
+    <sort-visualization id="merge-sort">
+        <p slot="sort-name">Merge Sort</p>
+    </sort-visualization>
 </body>
 
 

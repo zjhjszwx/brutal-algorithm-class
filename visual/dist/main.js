@@ -1,13 +1,15 @@
 // @ts-nocheck
 import { chan, select } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
 function SortVisualizationComponent(id, arrays) {
+    var _a;
     let ele = document.getElementById(id);
+    console.log(ele);
     let stop = chan();
     let resume = chan();
     // Animation SVG
-    CreateArrayAnimationSVGComponent(ele, id + 'animation', 0, 0)(arrays, stop, resume);
+    CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume);
     // Stop/Resume Button
-    let button = ele.getElementsByTagName('button')[0];
+    let button = (_a = ele.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector('button');
     let stopped = false;
     button.addEventListener('click', async () => {
         // if(!clicked) {
@@ -24,7 +26,8 @@ function SortVisualizationComponent(id, arrays) {
     });
 }
 function CreateArrayAnimationSVGComponent(parent, id, x, y) {
-    let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    let svg = parent.querySelector('svg');
+    // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.id = id;
     let div = document.createElement('div');
     div.appendChild(svg);
@@ -40,7 +43,7 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
                 let r = rect(x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(300);
+            await sleep(100);
         }
     };
     function rect(x, y, width, height) {
@@ -180,9 +183,17 @@ async function main() {
         return c;
     })();
     console.log(mergeQueue2);
-    // SortVisualizationComponent('insertion-sort', insertQueue);
-    // SortVisualizationComponent('merge-sort', mergeQueue2);
-    UI(stop, resume, array);
+    customElements.define('sort-visualization', class extends HTMLElement {
+        constructor() {
+            super();
+            let template = document.getElementById('sort-visualization');
+            let templateContent = template.content;
+            const shadowRoot = this.attachShadow({ mode: 'open' })
+                .appendChild(templateContent.cloneNode(true));
+        }
+    });
+    SortVisualizationComponent('insertion-sort', insertQueue);
+    SortVisualizationComponent('merge-sort', mergeQueue2);
 }
 main();
 async function needToStop(stop, resume) {
@@ -210,46 +221,4 @@ async function needToStop(stop, resume) {
         }
     })();
     return stopResume;
-}
-function UI(stop, resume, array) {
-    Vue.component('sort-visualization', {
-        props: ['name'],
-        data() {
-            return {
-                stopped: false,
-                state: 'stop',
-                array: []
-            };
-        },
-        methods: {
-            async click(event) {
-                this.stopped = !this.stopped;
-                if (this.stopped) {
-                    this.state = 'resume';
-                    await stop.put(null);
-                }
-                else {
-                    console.log(this.array);
-                    this.state = 'stop';
-                    await resume.put(null);
-                }
-            }
-        },
-        template: `
-        <div>
-        <div> {{name}} </div>
-        <button v-on:click="click"> {{ state }} </button>
-        <svg>
-            <rect v-for="i in array" x="120" width="5" height="10" rx="15" />
-        </svg>
-        </div>
-        `
-    });
-    console.log('UI');
-    console.log(array);
-    let iSort = new Vue({
-        el: '#insertion-sort'
-    });
-    iSort.array = array;
-    new Vue({ el: '#merge-sort' });
 }

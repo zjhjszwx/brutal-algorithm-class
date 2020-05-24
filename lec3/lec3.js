@@ -85,5 +85,7 @@ console.log('len', list.length());
 
 
 
+LinkedList()(Append)(10)(Length)() === 1
+
 
 
