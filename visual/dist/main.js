@@ -12,8 +12,6 @@ function SortVisualizationComponent(id, arrays) {
     let button = (_a = ele.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector('button');
     let stopped = false;
     button.addEventListener('click', async () => {
-        // if(!clicked) {
-        console.log('clicked', stopped, '->', !stopped);
         stopped = !stopped;
         if (stopped) {
             button.textContent = 'resume';
@@ -133,22 +131,6 @@ async function MergeSort(array, reactor) {
     }
     await reactor.put([array, 0]);
     return await sort(array, 0);
-}
-function controlButton(stop, resume) {
-    let button = document.getElementById('controlButton');
-    let stopped = false;
-    button.onclick = async () => {
-        // if(!clicked) {
-        console.log('clicked', stopped, '->', !stopped);
-        stopped = !stopped;
-        if (stopped) {
-            await stop.put(null);
-        }
-        else {
-            console.log('resume');
-            await resume.put(null);
-        }
-    };
 }
 async function main() {
     // init an array
