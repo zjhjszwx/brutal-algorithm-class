@@ -166,4 +166,4 @@ Let's plant trees!
 这是一节算法课，语言不是根本问题。课件会用JS因为我有准备一些前端算法可视化。作业大家可以用C, CPP, Java, Go, Python, JavaScript, 甚至 PHP。我都可以批改。
 
 
-[GitPod](https://f67cdf40-7d34-4b12-a06e-9a5a76967c39.ws-us02.gitpod.io/#/workspace/brutal-algorithm-class)
+[GitPod](https://gitpod.io/workspaces/)
