@@ -56,29 +56,31 @@ https://creatcodebuild.github.io/brutal-algorithm-class/visual/visual.html
 ## 第二周
 ### 第 4 课
 - 快排
-- 数组的二分搜索
+- 快排的复杂度分析
 
 ### 第 5 课
 Let's plant trees!
+- 数组的二分搜索
 - 树状结构
 - 二叉树
-- 深度优先搜索、广度优先搜索 DFS、BFS
+- 二叉搜索树
+- 深度优先搜索 DFS
 - 前、中、后序遍历
-- Level Order Traversal
 
 ### 第 6 课
-- 二叉搜索树
-- 树状结构的扁平化实现（用数组实现树）
-
-## 第三周
-### 第 7 课
-- 堆排序 Heap Sort
-- 优先级队列 Priority Queue
-
-### 第 8 课
 植树非一周之功！
 - 平衡的二叉树
 - AVL树
+- 广度优先搜索 BFS
+- Level Order Traversal
+
+## 第三周
+### 第 7 课
+????
+
+### 第 8 课
+- 堆排序 Heap Sort
+- 优先级队列 Priority Queue
 
 ### 第 9 课
 - 红黑树
