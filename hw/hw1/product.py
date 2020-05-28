@@ -3,6 +3,9 @@ Example code for the first homework
 '''
 
 def product(m1, m2):
+    '''
+    这里的实现对于矩阵形状的定义，恰好和 JS 反过来了
+    '''
     result = [None] * len(m2)
     for i, row in enumerate(m2):
         result[i] = [None] * len(m1[0])
