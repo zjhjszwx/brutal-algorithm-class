@@ -5,6 +5,9 @@ Example code for the first homework
 def product(m1, m2):
     '''
     这里的实现对于矩阵形状的定义，恰好和 JS 反过来了
+
+    时间复杂度：定义m1长宽为 L、W，m2长宽为 N，L。时间复杂度为 Θ(W * N * L)
+    空间复杂度：Θ(W * N)
     '''
     result = [None] * len(m2)
     for i, row in enumerate(m2):
