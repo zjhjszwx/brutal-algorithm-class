@@ -1,13 +1,9 @@
-from heapq import heapify
 from random import randint
 from time import time
 
-# 快排实现摘抄致 https://www.geeksforgeeks.org/python-program-for-quicksort/
-
-
 def partition(arr, low, high):
     i = (low-1)         # index of smaller element
-    pivot = arr[high]     # pivot
+    pivot = arr[high]   # pivot
 
     for j in range(low, high):
         if arr[j] <= pivot:
@@ -18,9 +14,8 @@ def partition(arr, low, high):
 
     return (i+1)
 
-# 你需要将递归改为循环，不然在几千个数的时候就会爆栈。
-
-
+# 快排实现摘抄自 https://www.geeksforgeeks.org/python-program-for-quicksort/
+# 但是，将递归改为循环，不然在几千个数的时候就会爆栈。
 def quickSort(arr, low, high):
     call_stack = [(arr, low, high)]
     while call_stack:
@@ -45,10 +40,10 @@ def timeit(f, *args):
     print(time() - t)
 
 
-for i in range(1000, 100001, 1000):
-    a1 = [randint(0, bound) for _ in range(0, i)]   # 乱序
-    print(i)
-    timeit(quickSort, a1, 0, len(a1)-1)
+# for i in range(1000, 100001, 1000):
+#     a1 = [randint(0, bound) for _ in range(0, i)]   # 乱序
+#     print(i)
+#     timeit(quickSort, a1, 0, len(a1)-1)
 
 for i in range(1000, 100001, 1000):
     a1 = [x for x in range(0, i)]                   # 正序慢很多，为什么？
