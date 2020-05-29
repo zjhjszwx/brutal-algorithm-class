@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { chan, Channel, select } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
+import { chan, Channel, select, after } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
 import { MergeSort, InsertionSort, infinite } from './sort.js';
 
 function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
 
     let ele: HTMLElement | null = document.getElementById(id);
-    if(!ele || !ele.shadowRoot) {
+    if (!ele || !ele.shadowRoot) {
         throw new Error('ele has no shadow root');
     }
     let stop = chan<null>();
@@ -13,12 +13,15 @@ function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
 
 
     // Animation SVG
-    let changeSpeed = chan();
-    CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume, changeSpeed);
+    let currentSpeed = {
+        value: 10000
+    };
+    let onclick = chan();
+    CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume, currentSpeed, onclick);
 
     // Stop/Resume Button
     let button = ele.shadowRoot.querySelector('button');
-    if(!button) {
+    if (!button) {
         throw new Error();
     }
     let stopped = false;
@@ -36,8 +39,8 @@ function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
     // Input
     let input = ele.shadowRoot.querySelector('input')
     input.addEventListener('input', async (ele, event: Event) => {
-        console.log(ele.target.value);
-        await changeSpeed.put(ele.target.value);
+        currentSpeed.value = Number(ele.target.value);
+        await onclick.put('onclick');
     })
 }
 
@@ -53,13 +56,15 @@ function CreateArrayAnimationSVGComponent(
     div.appendChild(svg);
     parent.insertBefore(div, parent.firstChild);
     return async (
-        arrays: Channel<number[]>, 
-        stop: Channel, 
+        arrays: Channel<number[]>,
+        stop: Channel,
         resume: Channel,
-        changeSpeed: Channel<number>
+        changeSpeed,
+        onclick
     ) => {
         let waitToResume = await needToStop(stop, resume);
-        let currentSpeed = 100;
+        let currentSpeed = changeSpeed.value;
+        let i = 0;
         for await (let array of arrays) {
             await waitToResume.pop();
             while (svg.lastChild) {
@@ -69,17 +74,30 @@ function CreateArrayAnimationSVGComponent(
                 let r = rect(x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(await select(
-                [
-                    [changeSpeed, newSpeed => {
-                        currentSpeed = newSpeed;
-                        return currentSpeed;
-                    }]
-                ],
-                () => {
-                    return currentSpeed;
+            let wait = true;
+            while (wait) {
+                let a;
+                try {
+                    a = after(changeSpeed.value);
+                    currentSpeed = changeSpeed.value;
+                } catch {
+                    console.log('catch', currentSpeed);
+                    a = after(currentSpeed);
                 }
-            ));
+                await select(
+                    [
+                        [a, async (waitedTime) => {
+                            console.log(i++, 'after', changeSpeed.value, waitedTime);
+                            wait = false;
+                        }],
+                        [onclick, async (x) => {
+                            console.log(i++, x, changeSpeed.value, currentSpeed);
+                        }]
+                    ]
+                )
+            }
+            // }
+            console.log(changeSpeed);
         }
     }
 
@@ -148,7 +166,7 @@ async function main() {
     })();
     console.log(mergeQueue2);
 
-    
+
     customElements.define('sort-visualization',
         class extends HTMLElement {
             constructor() {
