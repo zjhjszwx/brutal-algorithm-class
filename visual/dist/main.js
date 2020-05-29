@@ -2,15 +2,20 @@
 import { chan, select } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
 import { MergeSort, InsertionSort, infinite } from './sort.js';
 function SortVisualizationComponent(id, arrays) {
-    var _a;
     let ele = document.getElementById(id);
-    console.log(ele);
+    if (!ele || !ele.shadowRoot) {
+        throw new Error('ele has no shadow root');
+    }
     let stop = chan();
     let resume = chan();
     // Animation SVG
-    CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume);
+    let changeSpeed = chan();
+    CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume, changeSpeed);
     // Stop/Resume Button
-    let button = (_a = ele.shadowRoot) === null || _a === void 0 ? void 0 : _a.querySelector('button');
+    let button = ele.shadowRoot.querySelector('button');
+    if (!button) {
+        throw new Error();
+    }
     let stopped = false;
     button.addEventListener('click', async () => {
         stopped = !stopped;
@@ -23,6 +28,12 @@ function SortVisualizationComponent(id, arrays) {
             await resume.put(null);
         }
     });
+    // Input
+    let input = ele.shadowRoot.querySelector('input');
+    input.addEventListener('input', async (ele, event) => {
+        console.log(ele.target.value);
+        await changeSpeed.put(ele.target.value);
+    });
 }
 function CreateArrayAnimationSVGComponent(parent, id, x, y) {
     let svg = parent.querySelector('svg');
@@ -31,8 +42,9 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
     let div = document.createElement('div');
     div.appendChild(svg);
     parent.insertBefore(div, parent.firstChild);
-    return async (arrays, stop, resume) => {
+    return async (arrays, stop, resume, changeSpeed) => {
         let waitToResume = await needToStop(stop, resume);
+        let currentSpeed = 100;
         for await (let array of arrays) {
             await waitToResume.pop();
             while (svg.lastChild) {
@@ -42,7 +54,14 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
                 let r = rect(x + Number(i) * 4, y, 3, number);
                 svg.appendChild(r);
             }
-            await sleep(100);
+            await sleep(await select([
+                [changeSpeed, newSpeed => {
+                        currentSpeed = newSpeed;
+                        return currentSpeed;
+                    }]
+            ], () => {
+                return currentSpeed;
+            }));
         }
     };
     function rect(x, y, width, height) {

@@ -9,7 +9,6 @@ class WC<T> implements SelectableChannel<T> {
         private receive: SelectableChannel<T>, 
         private readyChan: SelectableChannel<T>,
         private socket: WebSocket) {
-
     }
 
     async put(ele: T): Promise<void> {
