@@ -97,11 +97,6 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
         return rect;
     }
 }
-function sleep(time) {
-    return new Promise((resolve) => {
-        setTimeout(resolve, time);
-    });
-}
 async function main() {
     // init an array
     let array = [];
