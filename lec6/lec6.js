@@ -190,7 +190,9 @@ DFS_LOOP(tree, function f(tree, order) {
         return;
     }
     order.push([f, tree.right]);
+    order.push([() => {
+        process.stdout.write(`${tree.data} `)
+    }]);
     order.push([f, tree.left]);
-    process.stdout.write(`${tree.data} `); // 
 });
 
