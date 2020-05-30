@@ -45,7 +45,7 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
     let div = document.createElement('div');
     div.appendChild(svg);
     parent.insertBefore(div, parent.firstChild);
-    return async (arrays, stop, resume, changeSpeed, onclick) => {
+    return async (arrays, stop, resume, changeSpeed, oninput) => {
         let waitToResume = await needToStop(stop, resume);
         let currentSpeed = changeSpeed.value;
         let i = 0;
@@ -74,7 +74,7 @@ function CreateArrayAnimationSVGComponent(parent, id, x, y) {
                             console.log(i++, 'after', changeSpeed.value, waitedTime);
                             wait = false;
                         }],
-                    [onclick, async (x) => {
+                    [oninput, async (x) => {
                             console.log(i++, x, changeSpeed.value, currentSpeed);
                         }]
                 ]);

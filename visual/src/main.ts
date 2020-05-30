@@ -60,7 +60,7 @@ function CreateArrayAnimationSVGComponent(
         stop: Channel,
         resume: Channel,
         changeSpeed,
-        onclick
+        oninput
     ) => {
         let waitToResume = await needToStop(stop, resume);
         let currentSpeed = changeSpeed.value;
@@ -90,7 +90,7 @@ function CreateArrayAnimationSVGComponent(
                             console.log(i++, 'after', changeSpeed.value, waitedTime);
                             wait = false;
                         }],
-                        [onclick, async (x) => {
+                        [oninput, async (x) => {
                             console.log(i++, x, changeSpeed.value, currentSpeed);
                         }]
                     ]
