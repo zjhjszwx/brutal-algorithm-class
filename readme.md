@@ -69,14 +69,14 @@ Let's plant trees!
 
 ### 第 6 课
 植树非一周之功！
-- 平衡的二叉树
-- AVL树
+- 将深度优先搜索从递归翻译成循环
 - 广度优先搜索 BFS
 - Level Order Traversal
 
 ## 第三周
 ### 第 7 课
-????
+- 平衡的二叉树
+- AVL树
 
 ### 第 8 课
 - 堆排序 Heap Sort
