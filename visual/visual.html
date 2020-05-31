@@ -27,12 +27,24 @@
 		</div>
 	</template>
 	<template id="data-source">
-		<button>Random</button>
-		<button>升序</button>
-		<button>降序</button>
-		<button>有序错位</button>
-		<button>堆化</button>
-		<textarea></textarea>
+		<style>
+			.flexbox {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: column;
+                margin: 10;
+			}
+		</style>
+		<div class="flexbox">
+			<div>
+				<button>Random</button>
+				<button>升序</button>
+				<button>降序</button>
+				<button>有序错位</button>
+				<button>堆化</button>
+			</div>
+			<textarea></textarea>
+		</div>
 	</template>
 	<sort-visualization id="insertion-sort">
 		<p slot="sort-name">Insertion Sort</p>

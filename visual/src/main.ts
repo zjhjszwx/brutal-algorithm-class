@@ -51,10 +51,10 @@ function CreateArrayAnimationSVGComponent(
 ) {
     let svg = parent.querySelector('svg');
     // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.id = id;
-    let div = document.createElement('div');
-    div.appendChild(svg);
-    parent.insertBefore(div, parent.firstChild);
+    // svg.id = id;
+    // let div = document.createElement('div');
+    // div.appendChild(svg);
+    // parent.insertBefore(div, parent.firstChild);
     return async (
         arrays: Channel<number[]>,
         stop: Channel,

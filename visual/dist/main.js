@@ -41,10 +41,10 @@ function SortVisualizationComponent(id, arrays) {
 function CreateArrayAnimationSVGComponent(parent, id, x, y) {
     let svg = parent.querySelector('svg');
     // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.id = id;
-    let div = document.createElement('div');
-    div.appendChild(svg);
-    parent.insertBefore(div, parent.firstChild);
+    // svg.id = id;
+    // let div = document.createElement('div');
+    // div.appendChild(svg);
+    // parent.insertBefore(div, parent.firstChild);
     return async (arrays, stop, resume, changeSpeed, oninput) => {
         let waitToResume = await needToStop(stop, resume);
         let currentSpeed = changeSpeed.value;
