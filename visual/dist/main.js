@@ -10,7 +10,7 @@ function SortVisualizationComponent(id, arrays) {
     let resume = chan();
     // Animation SVG
     let currentSpeed = {
-        value: 10000
+        value: 100
     };
     let onclick = chan();
     CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume, currentSpeed, onclick);
@@ -33,18 +33,17 @@ function SortVisualizationComponent(id, arrays) {
     });
     // Input
     let input = ele.shadowRoot.querySelector('input');
+    if (!input) {
+        throw new Error();
+    }
     input.addEventListener('input', async (ele, event) => {
         currentSpeed.value = Number(ele.target.value);
         await onclick.put('onclick');
     });
+    input.value = currentSpeed.value;
 }
 function CreateArrayAnimationSVGComponent(parent, id, x, y) {
     let svg = parent.querySelector('svg');
-    // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    // svg.id = id;
-    // let div = document.createElement('div');
-    // div.appendChild(svg);
-    // parent.insertBefore(div, parent.firstChild);
     return async (arrays, stop, resume, changeSpeed, oninput) => {
         let waitToResume = await needToStop(stop, resume);
         let currentSpeed = changeSpeed.value;

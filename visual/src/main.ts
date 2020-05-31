@@ -14,7 +14,7 @@ function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
 
     // Animation SVG
     let currentSpeed = {
-        value: 10000
+        value: 100
     };
     let onclick = chan();
     CreateArrayAnimationSVGComponent(ele.shadowRoot, id + 'animation', 0, 0)(arrays, stop, resume, currentSpeed, onclick);
@@ -37,11 +37,15 @@ function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
     });
 
     // Input
-    let input = ele.shadowRoot.querySelector('input')
+    let input = ele.shadowRoot.querySelector('input');
+    if(!input) {
+        throw new Error();
+    }
     input.addEventListener('input', async (ele, event: Event) => {
         currentSpeed.value = Number(ele.target.value);
         await onclick.put('onclick');
     })
+    input.value = currentSpeed.value;
 }
 
 function CreateArrayAnimationSVGComponent(
@@ -50,11 +54,6 @@ function CreateArrayAnimationSVGComponent(
     x: number, y: number
 ) {
     let svg = parent.querySelector('svg');
-    // let svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    // svg.id = id;
-    // let div = document.createElement('div');
-    // div.appendChild(svg);
-    // parent.insertBefore(div, parent.firstChild);
     return async (
         arrays: Channel<number[]>,
         stop: Channel,
@@ -162,11 +161,11 @@ async function main() {
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
     let ele = get('data-source-1');
-    if(!ele.shadowRoot) {
+    if (!ele.shadowRoot) {
         throw new Error(`element ${ele.id} does not have shadowRoot`);
     }
     let textarea = ele.shadowRoot.querySelector('textarea');
-    if(!textarea) {
+    if (!textarea) {
         throw new Error();
     }
     textarea.textContent = JSON.stringify(array);
@@ -231,7 +230,7 @@ function DefineComponent() {
 
 function get(id: string): HTMLElement {
     let ele = document.getElementById(id)
-    if(!ele) {
+    if (!ele) {
         throw new Error(`element ${id} does not exist`);
     }
     return ele;
