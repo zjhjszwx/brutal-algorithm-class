@@ -21,8 +21,8 @@ tree.traversal('pre/in/post', (element) => {
 ```js
 let tree = new Tree();
 let iterTree = tree.iter('pre/in/post');    // 哪一种顺序
-iterTree.next()     // 返回第一个节点
-iterTree.next()     // 返回第第二个节点
+iterTree.next()     // 返回第一个节点的data
+iterTree.next()     // 返回第第二个节点的data
 iterTree.next()     // 如果已经没有新的节点可以遍历，那么请返回一个错误。取决于你使用的语言，可以选择抛出异常或者返回（数值，错误）对。
 ```
 
