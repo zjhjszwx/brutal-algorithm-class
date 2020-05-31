@@ -1,38 +1,46 @@
 <html>
 
 <head>
-    <script type="module" src="./dist/main.js"></script>
+	<script type="module" src="./dist/main.js"></script>
 </head>
 
 
 <body>
-    <template id="sort-visualization">
-        <style>
-            p {
-                color: white;
-                background-color: #666;
-                padding: 5px;
-            }
-        </style>
-        <slot name="sort-name">Sort Name</slot>
-        <button>stop</button>
-        <input type="number" placeholder="修改动画速度", value="2000">
-        <svg></svg>
-    </template>
-    <template id="data-source">
-        <button>Random</button>
-        <button>升序</button>
-        <button>降序</button>
-        <button>有序错位</button>
-        <button>堆化</button>
-        <textarea></textarea>
-    </template>
-    <sort-visualization id="insertion-sort">
-        <p slot="sort-name">Insertion Sort</p>
-    </sort-visualization>
-    <sort-visualization id="merge-sort">
-        <p slot="sort-name">Merge Sort</p>
-    </sort-visualization>
+	<template id="sort-visualization">
+		<style>
+			p {
+				color: white;
+				background-color: #666;
+				padding: 5px;
+			}
+
+			div {
+				display: flex;
+				flex-wrap: wrap;
+			}
+		</style>
+		<div>
+			<slot name="sort-name">Sort Name</slot>
+			<button>stop</button>
+			<input type="number" placeholder="修改动画速度", value="2000">
+			<svg width="200" , height="100"></svg>
+		</div>
+	</template>
+	<template id="data-source">
+		<button>Random</button>
+		<button>升序</button>
+		<button>降序</button>
+		<button>有序错位</button>
+		<button>堆化</button>
+		<textarea></textarea>
+	</template>
+	<sort-visualization id="insertion-sort">
+		<p slot="sort-name">Insertion Sort</p>
+	</sort-visualization>
+	<sort-visualization id="merge-sort">
+		<p slot="sort-name">Merge Sort</p>
+	</sort-visualization>
+	<data-source id="data-source-1"></data-source>
 </body>
 
 

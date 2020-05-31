@@ -1,4 +1,4 @@
-// Θ(logn)，每次递归 O(1),递归 n 次。
+// Θ(logn)，每次递归 O(1),递归 logn 次。
 function binarySearch(array, ele) {
     if (array.length === 0) {
         return false;

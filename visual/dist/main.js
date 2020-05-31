@@ -132,17 +132,19 @@ async function main() {
         return c;
     })();
     console.log(mergeQueue2);
-    customElements.define('sort-visualization', class extends HTMLElement {
-        constructor() {
-            super();
-            let template = document.getElementById('sort-visualization');
-            let templateContent = template.content;
-            const shadowRoot = this.attachShadow({ mode: 'open' })
-                .appendChild(templateContent.cloneNode(true));
-        }
-    });
+    // Components
+    DefineComponent();
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
+    let ele = get('data-source-1');
+    if (!ele.shadowRoot) {
+        throw new Error(`element ${ele.id} does not have shadowRoot`);
+    }
+    let textarea = ele.shadowRoot.querySelector('textarea');
+    if (!textarea) {
+        throw new Error();
+    }
+    textarea.textContent = JSON.stringify(array);
 }
 main();
 async function needToStop(stop, resume) {
@@ -170,4 +172,32 @@ async function needToStop(stop, resume) {
         }
     })();
     return stopResume;
+}
+function DefineComponent() {
+    // Web Components
+    customElements.define('sort-visualization', class extends HTMLElement {
+        constructor() {
+            super();
+            let template = document.getElementById('sort-visualization');
+            let templateContent = template.content;
+            const shadowRoot = this.attachShadow({ mode: 'open' })
+                .appendChild(templateContent.cloneNode(true));
+        }
+    });
+    customElements.define('data-source', class extends HTMLElement {
+        constructor() {
+            super();
+            let template = document.getElementById('data-source');
+            let templateContent = template.content;
+            const shadowRoot = this.attachShadow({ mode: 'open' })
+                .appendChild(templateContent.cloneNode(true));
+        }
+    });
+}
+function get(id) {
+    let ele = document.getElementById(id);
+    if (!ele) {
+        throw new Error(`element ${id} does not exist`);
+    }
+    return ele;
 }
