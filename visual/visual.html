@@ -1,21 +1,57 @@
 <html>
 
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script type="module" src="./dist/main.js"></script>
+	<script type="module" src="./dist/main.js"></script>
 </head>
 
+
 <body>
-    <!-- <svg id="svg" viewBox="0 0 220 120"> -->
-    <!-- <rect width="5" height="100"/> -->
-    <!-- </svg>
-    <button id="controlButton">stop</button> -->
-    <sort-visualization id="insertion-sort"
-        name="Insertion Sort"
-    ></sort-visualization>
-    <sort-visualization id="merge-sort"
-        name="Merge Sort"
-    ></sort-visualization>
+	<template id="sort-visualization">
+		<style>
+			.flexbox {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: column;
+				margin: 10;
+			}
+		</style>
+		<div class="flexbox">
+			<slot name="sort-name">Sort Name</slot>
+			<svg width="200" , height="100"></svg>
+			<div>
+				<button>stop</button>
+				<input type="number" placeholder="修改动画速度">
+            </div>
+			</div>
+	</template>
+	<template id="data-source">
+		<style>
+			.flexbox {
+				display: flex;
+				flex-wrap: wrap;
+				flex-direction: column;
+				margin: 10;
+			}
+		</style>
+		<div class="flexbox">
+			<div>
+				<button>Random</button>
+				<button>升序</button>
+				<button>降序</button>
+				<button>有序错位</button>
+				<button>堆化</button>
+                <button id="reset">重置</button>
+			</div>
+			<textarea></textarea>
+		</div>
+	</template>
+	<sort-visualization id="insertion-sort">
+		<p slot="sort-name">Insertion Sort 插入排序</p>
+	</sort-visualization>
+	<sort-visualization id="merge-sort">
+		<p slot="sort-name">Merge Sort 归并排序</p>
+	</sort-visualization>
+	<data-source id="data-source-1"></data-source>
 </body>
 
 

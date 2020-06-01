@@ -63,6 +63,8 @@ interface LinkedList {
                             // insert(element, 0) 等于 append_head(element)
                             // insert(element, length()) 等于 append(element)
     get(index)              // 得到 index 位的元素
+    pop_tail()
+    pop_head()
 }
 
 interface Node<T> {

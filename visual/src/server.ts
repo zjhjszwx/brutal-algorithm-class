@@ -1,12 +1,12 @@
 import { serve, ServerRequest  } from "https://deno.land/std/http/server.ts";
-import { Channel, sleep } from "https://creatcodebuild.github.io/graphql-projects/csp/dist/es/csp.js";
+import { Channel, sleep } from 'https://creatcodebuild.github.io/csp/dist/csp.ts';
 import { default as graphql } from "https://creatcodebuild.github.io/graphql-projects/deno-graphql-port/dist/graphql.js";
 
 import {
     acceptWebSocket,
     isWebSocketCloseEvent,
     isWebSocketPingEvent,
-} from "https://deno.land/std/ws/mod.ts";
+} from "https://deno.land/std/ws/mod.js";
 
 
 try {
