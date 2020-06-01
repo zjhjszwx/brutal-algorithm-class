@@ -272,18 +272,20 @@ class Node {
   }
 }
 
-let list = new LinkedList();
-list.append(1);
-list.append_head(4);
-list.append_head(5);
-list.insert(3, 2);
-list.insert(2, 2);
+// let list = new LinkedList();
+// list.append(1);
+// list.append(4);
+// list.append(5);
+// list.append(6);
+// list.insert(2, 1);
+// list.insert(3, 2);
 
-// 5 4 2 3 1
-list.get(0);
-list.get(1);
-list.get(2);
-list.get(3);
-list.get(4);
+// // 5 4 2 3 1
+// list.get(0);
+// list.get(1);
+// list.get(2);
+// list.get(3);
+// list.get(4);
+// list.get(5);
 
-console.log("len", list.length());
+// console.log("len", list.length());
