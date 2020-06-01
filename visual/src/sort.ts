@@ -1,8 +1,9 @@
-import { chan, Channel, select } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
+// @ts-ignore
+import { chan, Channel, select } from 'https://creatcodebuild.github.io/csp/dist/csp.ts';
 
-export async function InsertionSort(array, reactor: Channel<number[]>) {
+export async function InsertionSort(array: number[], reactor: Channel<number[]>) {
 
-    function insert(array, number) {
+    function insert(array: number[], number: number) {
         // [1, 2, 4, 5], 3
         // in-place
         // immutable 不可变
@@ -35,7 +36,7 @@ export async function InsertionSort(array, reactor: Channel<number[]>) {
 }
 
 
-export async function MergeSort(array, reactor: Channel<[number[], number]>) {
+export async function MergeSort(array: number[], reactor: Channel<[number[], number]>) {
 
     async function merge(l: number[], r: number[], startIndex: number): Promise<number[]> {
         if (l.length === 0) {
@@ -56,7 +57,7 @@ export async function MergeSort(array, reactor: Channel<[number[], number]>) {
         return shifted;
     }
 
-    async function sort(array, startIndex): Promise<number[]> {
+    async function sort(array: number[], startIndex: number): Promise<number[]> {
         if (array.length <= 1) {
             return array;
         }
@@ -75,8 +76,29 @@ export async function MergeSort(array, reactor: Channel<[number[], number]>) {
     return await sort(array, 0);
 }
 
-export async function infinite(f, ...args) {
+export async function infinite(f: Function, ...args: any[]) {
     while(true) {
         await f(...args);
+    }
+}
+
+
+export async function Sorter(sortFunc: GeneratorFunction, resetChannel: Channel<number[]>, renderChannel: Channel<number[]>) {
+    let arrayToSort = await resetChannel.pop()
+    let sorting = sortFunc(arrayToSort);
+    while(true) {
+        await select([
+            [resetChannel, async (array) => {
+                arrayToSort = array;
+                sorting = sortFunc(arrayToSort);
+            }]
+        ],
+        async () => {
+            let { value, done } = sorting.next();
+            await renderChannel.put(value);
+            if(done) {
+                sorting = sortFunc(arrayToSort);
+            }
+        })
     }
 }

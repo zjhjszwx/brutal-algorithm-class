@@ -132,6 +132,7 @@ async function main() {
     })();
     console.log(mergeQueue2);
     // Components
+    let resetChannel = chan();
     DefineComponent();
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
@@ -144,6 +145,11 @@ async function main() {
         throw new Error();
     }
     textarea.textContent = JSON.stringify(array);
+    let resetButton = ele.shadowRoot.getElementById('reset');
+    resetButton.addEventListener('click', async () => {
+        let array = JSON.parse(textarea.textContent);
+        await resetChannel.put();
+    });
 }
 main();
 async function needToStop(stop, resume) {

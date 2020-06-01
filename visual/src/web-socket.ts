@@ -1,4 +1,4 @@
-import { WebSocketClient, GraphQLSubscription } from './client.js';
+import { WebSocketClient, GraphQLSubscription } from './client.ts';
 
 async function ws() {
     let client = await WebSocketClient('ws://localhost:8081');

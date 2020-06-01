@@ -1,3 +1,5 @@
+// @ts-ignore
+import { select } from 'https://creatcodebuild.github.io/csp/dist/csp.ts';
 export async function InsertionSort(array, reactor) {
     function insert(array, number) {
         // [1, 2, 4, 5], 3
@@ -70,5 +72,23 @@ export async function MergeSort(array, reactor) {
 export async function infinite(f, ...args) {
     while (true) {
         await f(...args);
+    }
+}
+export async function Sorter(sortFunc, resetChannel, renderChannel) {
+    let arrayToSort = await resetChannel.pop();
+    let sorting = sortFunc(arrayToSort);
+    while (true) {
+        await select([
+            [resetChannel, async (array) => {
+                    arrayToSort = array;
+                    sorting = sortFunc(arrayToSort);
+                }]
+        ], async () => {
+            let { value, done } = sorting.next();
+            await renderChannel.put(value);
+            if (done) {
+                sorting = sortFunc(arrayToSort);
+            }
+        });
     }
 }

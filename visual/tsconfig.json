@@ -2,8 +2,7 @@
     "compilerOptions": {
         "target": "ES2018",
         "rootDir": "src",
-        "outDir": "dist",
-        "strictNullChecks": true
+        "outDir": "dist"
     },
     "exclude": [
         "src/server.ts"

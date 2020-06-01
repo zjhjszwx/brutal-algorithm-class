@@ -1,6 +1,6 @@
 // @ts-nocheck
-import { chan, Channel, select, after } from 'https://creatcodebuild.github.io/csp/dist/csp.js';
-import { MergeSort, InsertionSort, infinite } from './sort.js';
+import { chan, Channel, select, after } from 'https://creatcodebuild.github.io/csp/dist/csp.ts';
+import { MergeSort, InsertionSort, infinite } from './sort.ts';
 
 function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
 
@@ -41,9 +41,10 @@ function SortVisualizationComponent(id: string, arrays: Channel<number[]>) {
     if(!input) {
         throw new Error();
     }
-    input.addEventListener('input', async (ele, event: Event) => {
+    input.addEventListener('input', (ele, event): any => {
         currentSpeed.value = Number(ele.target.value);
-        await onclick.put('onclick');
+        onclick.put('onclick');
+        return 1;
     })
     input.value = currentSpeed.value;
 }
@@ -157,6 +158,7 @@ async function main() {
     console.log(mergeQueue2);
 
     // Components
+    let resetChannel = chan();
     DefineComponent();
     SortVisualizationComponent('insertion-sort', insertQueue);
     SortVisualizationComponent('merge-sort', mergeQueue2);
@@ -169,6 +171,11 @@ async function main() {
         throw new Error();
     }
     textarea.textContent = JSON.stringify(array);
+    let resetButton = ele.shadowRoot.getElementById('reset');
+    resetButton.addEventListener('click', async () => {
+        let array = JSON.parse(textarea.textContent);
+        await resetChannel.put();
+    });
 }
 main();
 
